@@ -430,6 +430,7 @@ public class ClientFrame extends JFrame implements ActionListener {
 		if (sobre == null) {
 			try {
 				sobre = new JMenuItem("Sobre");
+				sobre.addActionListener(this);
 			} catch (java.lang.Throwable e) {
 				
 			}
@@ -439,7 +440,9 @@ public class ClientFrame extends JFrame implements ActionListener {
 	
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource().equals(cerrar)){
-			ClientFrame.app.closeConnection();
+			if(ClientFrame.app!=null){
+				ClientFrame.app.closeConnection();
+			}
 			if(timer!=null && timer.isRunning()){
 				timer.stop();
 			}
@@ -468,6 +471,9 @@ public class ClientFrame extends JFrame implements ActionListener {
 			ClientFrame.msg.setText("");
 			this.displayMessage("Te saliste de la sala");
 			this.userlist.removeAllElements();
+		} else if(e.getSource().equals(sobre)){
+			AboutFrame frame = new AboutFrame();
+			frame.setVisible(true);
 		}
 	}
 	
