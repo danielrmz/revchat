@@ -97,7 +97,8 @@ public class ConfigFrame extends JDialog implements ActionListener {
 				if(ClientFrame.app == null){
 					ClientFrame.setClient(hostip);
 					this.server.setEnabled(false);
-				} else { 
+				} else {
+					ClientFrame.app.closeConnection();
 					ClientFrame.setClient(hostip);
 				}
 				
