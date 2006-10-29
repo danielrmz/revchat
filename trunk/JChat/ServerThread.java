@@ -55,6 +55,8 @@ public class ServerThread implements Runnable {
 				this.connection.close();
 				Server.clients.remove(this);
 				this.connection = null;
+				Message m = new Message(new Command(Command.REMOVE_USER,this.nickname),"SERVER");
+				ServerThread.sendToAll(m);
 				System.out.println("El usuario '"+this.getNickname()+"' se salio");
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -167,8 +169,6 @@ public class ServerThread implements Runnable {
 			
 			} catch (SocketException ee){ 
 				this.close();
-				Message m = new Message(new Command(Command.REMOVE_USER,this.nickname),"SERVER");
-				ServerThread.sendToAll(m);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			} catch (Exception e){

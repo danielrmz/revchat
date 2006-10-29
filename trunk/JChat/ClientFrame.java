@@ -34,7 +34,7 @@ public class ClientFrame extends JFrame implements ActionListener {
 	private LinkedList<Message> localhistory = new LinkedList<Message>();
 	private Timer timer = null;
 	private DefaultListModel userlist = new DefaultListModel();
-	
+	private JLabel lblContact = new JLabel();
 	/**
 	 * This is the default constructor
 	 */
@@ -100,12 +100,16 @@ public class ClientFrame extends JFrame implements ActionListener {
 		case Command.ADD_USER:
 			String user = (String)cmd.msg;
 			this.userlist.addElement(user);
+			this.lblContact.setText("Usuarios ["+this.userlist.getSize()+"]");
 			this.displayMessage("El usuario "+user+" entro en la sala.\n");
 			break;
 		case Command.REMOVE_USER:
 			String user_ = (String)cmd.msg;
 			this.userlist.removeElement(user_);
-			this.displayMessage("El usuario "+user_+" se salio de la sala.\n");
+			if(!user_.equals("")){
+				this.displayMessage("El usuario "+user_+" se salio de la sala.\n");
+			}
+			this.lblContact.setText("Usuarios ["+this.userlist.getSize()+"]");
 			
 			break;
 		case Command.CLOSE_CONNECTION:
@@ -126,6 +130,8 @@ public class ClientFrame extends JFrame implements ActionListener {
 					this.userlist.addElement(usuario);
 				}
 			}
+			this.lblContact.setText("Usuarios ["+this.userlist.size()+"]");
+			
 			break;
 		}
 	}
@@ -248,7 +254,7 @@ public class ClientFrame extends JFrame implements ActionListener {
 		
 		//-- History Log
 		JLabel logbg = new JLabel();
-		ImageIcon logimg = Main.getIconImage("log.png");
+		ImageIcon logimg = Main.getIconImage("logbox.png");
 		logbg.setIcon(logimg);
 		logbg.setLocation(4,4);
 		logbg.setSize(new Dimension(600,435));
@@ -256,11 +262,23 @@ public class ClientFrame extends JFrame implements ActionListener {
 		
 		//-- Usuarios
 		JLabel users = new JLabel();
-		ImageIcon uimg = Main.getIconImage("users.png");
+		ImageIcon uimg = Main.getIconImage("usersbox.png");
 		users.setIcon(uimg);
 		users.setSize(new Dimension(174,434));
-		users.setLocation(new Point(605,4));
+		users.setLocation(new Point(606,4));
 		jDesktop.add(users,JLayeredPane.PALETTE_LAYER);
+		
+		JLabel contacts = new JLabel();
+		ImageIcon cimg = Main.getIconImage("contacts.png");
+		contacts.setIcon(cimg);
+		contacts.setSize(new Dimension(22,22));
+		contacts.setLocation(new Point(613,5));
+		jDesktop.add(contacts,JLayeredPane.MODAL_LAYER);
+		lblContact = new JLabel("Usuarios [0]");
+		lblContact.setFont(new Font("Arial",Font.BOLD,12));
+		lblContact.setSize(new Dimension(70,20));
+		lblContact.setLocation(new Point(640,9));
+		jDesktop.add(lblContact,JLayeredPane.MODAL_LAYER);
 	}
 	
 
@@ -275,11 +293,11 @@ public class ClientFrame extends JFrame implements ActionListener {
 		
 		lstUsers = new JList(this.userlist);
 		//lstUsers.setLocation(new Point(610,11));
-		lstUsers.setSize(new Dimension(165,417));
+		lstUsers.setSize(new Dimension(165,400));
 		
 		JScrollPane usp = new JScrollPane(lstUsers,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		usp.setSize(new Dimension(160,417));
-		usp.setLocation(new Point(611,11));
+		usp.setSize(new Dimension(160,400));
+		usp.setLocation(new Point(612,31));
 		usp.setOpaque(false);
 		usp.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY,1));
 			
@@ -363,6 +381,7 @@ public class ClientFrame extends JFrame implements ActionListener {
 				send.setLocation(new Point(700,446));
 				send.setSize(new Dimension(70,40));
 				send.setEnabled(false);
+				
 			} catch (java.lang.Throwable e) {
 				
 			}
