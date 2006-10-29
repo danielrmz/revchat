@@ -20,12 +20,17 @@ public class Command implements Serializable {
 		/**
 		 * Estatica que pide la lista de usuarios
 		 */
-		public static final int FETCH_USERS = 1;
+		public static final int ADD_USER = 1;
+		
+		/**
+		 * Remove User
+		 */
+		public static final int REMOVE_USER = 2;
 		
 		/**
 		 * Nick Register
 		 */
-		public static final int NICK_REGISTER = 2;
+		public static final int NICK_REGISTER = 3;
 		
 		
 		

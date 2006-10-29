@@ -8,7 +8,7 @@ import java.net.*;
  * @package server
  **/
 
-public class ClientThread implements Runnable {
+public class ServerThread implements Runnable {
 	
 	/**
 	 * Objeto de Salida para el cliente
@@ -26,11 +26,6 @@ public class ClientThread implements Runnable {
 	private Socket connection; 
 	
 	/**
-	 * Contador de Conexiones
-	 */
-	public static int counter = 1; // counter of number of connections
-	
-	/**
 	 * Nickname
 	 */
 	private String nickname = "";
@@ -39,9 +34,8 @@ public class ClientThread implements Runnable {
 	 * Constructor de la conexion
 	 * @param connection
 	 */
-	public ClientThread(Socket connection) throws IOException {
-		ClientThread.counter++;
-		this.nickname = "User_"+ClientThread.counter;
+	public ServerThread(Socket connection) throws IOException {
+		this.nickname = "";
 		this.connection = connection;
 		this.output = new ObjectOutputStream(connection.getOutputStream());
 		this.output.flush();
@@ -53,15 +47,16 @@ public class ClientThread implements Runnable {
 	 * @throws IOException
 	 */
 	public void close() {
-		try {
-			ClientThread.counter--;
-			this.output.close();
-			this.input.close();
-			this.connection.close();
-			Server.clients.remove(this);
-			this.connection = null;
-		} catch (IOException e) {
-			e.printStackTrace();
+		if(this.connection != null){
+			try {
+				this.output.close();
+				this.input.close();
+				this.connection.close();
+				Server.clients.remove(this);
+				this.connection = null;
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -119,7 +114,7 @@ public class ClientThread implements Runnable {
 	 */
 	public static void sendToAll(Object message){
 		for(int i = 0; i < Server.clients.size(); i++){
-			ClientThread client = (ClientThread)Server.clients.get(i);
+			ServerThread client = (ServerThread)Server.clients.get(i);
 			client.sendMessage(message);
 		}
 	}
@@ -147,7 +142,7 @@ public class ClientThread implements Runnable {
 					Server.history.addLast(message); //-- Copia a Version local
 					
 					if(message.getTipo() == Message.MENSAJE){
-						ClientThread.sendToAll(message); //-- Se lo manda a todos
+						ServerThread.sendToAll(message); //-- Se lo manda a todos
 					} else if(message.getTipo() == Message.COMMAND){
 						Command c = message.getCommand();
 						if(c.type == Command.NICK_REGISTER){
@@ -155,11 +150,7 @@ public class ClientThread implements Runnable {
 							Command c2 = new Command(Command.NICK_REGISTER,this.setNickname(nick));
 							Message m = new Message(c2,"SERVER");
 							this.sendMessage(m);
-						} else if(c.type == Command.FETCH_USERS){
-							Command c2 = new Command(Command.FETCH_USERS,Server.getUsers());
-							Message m = new Message(c2,"SERVER");
-							ClientThread.sendToAll(m); //-- Se actualiza la lista de todos
-						}
+						} 
 					}
 				}	
 				Thread.sleep(10);
@@ -167,7 +158,7 @@ public class ClientThread implements Runnable {
 			} catch (SocketException ee){ 
 				this.close();
 			} catch (InterruptedException e) {
-					e.printStackTrace();
+				e.printStackTrace();
 			} catch (Exception e){
 				e.printStackTrace();
 				this.close();
@@ -180,14 +171,27 @@ public class ClientThread implements Runnable {
 	}
 	
 	public boolean setNickname(String nickname){
+		
+		//-- No debe tomar el mismo nombre que el servidor
+		if(nickname.toUpperCase().equals("SERVER")) {
+			return false;
+		}
+		
+		//-- Se busca a ver si no esta registrado
 		for(int i = 0; i < Server.clients.size(); i++){
-			ClientThread client = (ClientThread)Server.clients.get(i);
+			ServerThread client = (ServerThread)Server.clients.get(i);
 			String aux = client.getNickname();
 			if(aux.equals(nickname)) {
+				System.out.println(nickname+i);
 				return false;
 			}
 		}
 		this.nickname = nickname;
+		
+		//-- Se le notifica a todos que agreguen el nick a la lista
+		Message nickRegistered = new Message(new Command(Command.ADD_USER,nickname),"SERVER");
+		ServerThread.sendToAll(nickRegistered);
+		
 		return true;
 	}
 }

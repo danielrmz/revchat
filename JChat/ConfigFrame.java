@@ -1,11 +1,10 @@
 import java.awt.*;
 import java.awt.event.*;
-import java.util.LinkedList;
-
 import javax.swing.*;
 
 /** 
  * Clase ConfigFrame.java 
+ * Registra el usuario en el servidor, y crea la conexion.
  * 
  * @author Revolution Software Developers
  **/
@@ -26,7 +25,7 @@ public class ConfigFrame extends JDialog implements ActionListener {
 	
 	private JTextField server = new JTextField(ConfigFrame.getHostip());
 	
-	private JLabel error = new JLabel("Nickname esta siendo usado");
+	private JLabel error = new JLabel("");
 	
 	public ConfigFrame() {
 		this.setSize(new Dimension(217,130));
@@ -92,39 +91,44 @@ public class ConfigFrame extends JDialog implements ActionListener {
 			
 			String hostip   = server.getText();
 			String nickname = nick.getText();
-			
+			//-- Si no estan vacios los campos, se conecta
 			if(!nickname.equals("") && !hostip.equals("")){
-				boolean registered = true;
+				//-- Inicializa el cliente.
 				if(ClientFrame.app == null){
 					ClientFrame.setClient(hostip);
-					registered = ClientFrame.app.setNickname(nickname);
 					this.server.setEnabled(false);
 				} else { 
-					//ClientFrame.app.setServerip(hostip);
-					registered = ClientFrame.app.setNickname(nickname);
+					ClientFrame.setClient(hostip);
 				}
 				
+				//-- Intenta conectarse con el servidor
+				if(!ClientFrame.app.runClient()){
+					error.setForeground(Color.RED);
+					error.setText("     Servidor no disponible");
+					error.setVisible(true);
+					this.server.setEnabled(true);
+					return;
+				} 
+				
+				//-- Intenta registrar el nick, si ya esta ocupado
+				//-- regresa mensaje de error
+				boolean registered = ClientFrame.app.setNickname(nickname);
 				if(!registered){
+					error.setForeground(Color.RED);
+					error.setText("Nickname esta siendo usado");
 					error.setVisible(true);
 					return;
 				}
 				
-				Command list = ((Message)ClientFrame.app.getUsers()).getCommand();
-				
-				LinkedList aux = (LinkedList)list.msg;
-				Object[] x = new Object[aux.size()];
-				ClientFrame.lstUsers.removeAll();
-				int i = 0;
-				while(!aux.isEmpty()){
-					x[i] = (String)aux.removeFirst();
-					System.out.println((String)x[i]);
-					//ClientFrame.lstUsers.setListData(aux.toArray());
-					i++;
-				}
-				//TODO: pasar esto a la parte donde checa los mensajes
-				ClientFrame.conectar.setText("Desconectar");
+				//-- Reconfigura la pantalla principal para habilitar el chat
+				ClientFrame.conectar.setVisible(false);
+				ClientFrame.desconectar.setVisible(true);
+				ClientFrame.send.setEnabled(true);
+				ClientFrame.msg.setEnabled(true);
 			}
 			
+			//-- Guarda las variables para que si se desconecta al conectarse
+			//-- Continue con su nick y hostip
 			ConfigFrame.setHostip(hostip);
 			ConfigFrame.setNickname(nickname);
 			this.dispose();

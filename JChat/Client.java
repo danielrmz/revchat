@@ -49,16 +49,15 @@ public class Client {
 	 */
 	public Client(String ip) {
 		this.serverip = ip;
-		this.runClient();
-		
 	}
 	
 	/**
 	 * Empieza la conexion con el servidor
 	 */
-	public void runClient() {
+	public boolean runClient() {
+		boolean connected = false;
 		try {
-			System.out.println( "Attempting connection\n" );
+			System.out.println( "Intentando Conexion" );
 			client = new Socket(InetAddress.getByName(this.serverip) , 1211 );
 			System.out.println( "Connected to: " + client.getInetAddress().getHostName() );
 			
@@ -66,7 +65,7 @@ public class Client {
 			output.flush();
 			Receiver r = new Receiver();
 			r.start();
-			
+			connected = true;
 		} catch (ConnectException e){
 			System.out.println("Fallo la conexion con el servidor.");
 		} catch ( EOFException eofException ) {
@@ -74,6 +73,8 @@ public class Client {
 		} catch ( IOException ioException ) {
 			ioException.printStackTrace();
 		} 
+		
+		return connected;
 	} 
 	
 	/**
@@ -85,7 +86,7 @@ public class Client {
 	         input.close(); 
 	         client.close(); 
 	         System.out.println("Conexion del cliente terminada");
-	      
+	        
 	    } catch ( IOException ioException ) {
 	         ioException.printStackTrace();
 	    } 
@@ -164,7 +165,7 @@ public class Client {
 	 * @param nickname The nickname to set.
 	 */
 	public boolean setNickname(String nickname) {
-		Message regnick = new Message(new Command(Command.NICK_REGISTER,this.nickname),this.client.getLocalAddress().toString());
+		Message regnick = new Message(new Command(Command.NICK_REGISTER,nickname),this.client.getLocalAddress().toString());
 		this.sendMessage(regnick);
 		try {
 			Thread.sleep(15);
@@ -184,23 +185,6 @@ public class Client {
 		return ok;
 	}
 	
-	public Message getUsers(){
-		Message regnick = new Message(new Command(Command.FETCH_USERS,this.nickname),this.client.getLocalAddress().toString());
-		this.sendMessage(regnick);
-		try {
-			Thread.sleep(15);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		Message reply = this.localhistory.getLast();
-		if(reply.getTipo() == Message.COMMAND){
-			Command c = reply.getCommand();
-			if(c.type == Command.FETCH_USERS){
-				return reply;
-			}
-		}
-		return null;
-	}
 
 	private class Receiver extends Thread {
 		private Message message = null;
@@ -215,17 +199,12 @@ public class Client {
 		}
 		
 		public void run() {
-			while(ClientFrame.app.client != null && ClientFrame.app.client.isConnected()){
+			while(ClientFrame.app.client != null && !ClientFrame.app.client.isClosed()){
 				try {
 					message = (Message)input.readObject();
 					localhistory.addLast(message);
-						
-					if(message != null && message.getTipo() == Message.COMMAND){
-						Command c = message.getCommand();
-						if(c.type == Command.CLOSE_CONNECTION && message.getUsuario().equals("SERVER")){
-							closeConnection();
-						}
-					}
+				} catch (EOFException eof){
+					
 				} catch (SocketException se) {
 					closeConnection();
 				} catch (IOException e) {

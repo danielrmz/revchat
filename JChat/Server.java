@@ -18,7 +18,7 @@ public class Server {
 	/**
 	 * Clientes del servidor
 	 */
-	public static LinkedList<ClientThread> clients = new LinkedList<ClientThread>(); 
+	public static LinkedList<ServerThread> clients = new LinkedList<ServerThread>(); 
 	
 	/**
 	 * Historial del Chat 
@@ -76,7 +76,7 @@ public class Server {
 	         while (Server.active) {
 	        	try {
 	            	Socket serversocket = server.accept();
-	            	ClientThread connection = new ClientThread(serversocket);
+	            	ServerThread connection = new ServerThread(serversocket);
 	            	pool.execute(connection);
 	            	Server.clients.addLast(connection);
 	            	Server.viewConnections(); 
@@ -84,9 +84,10 @@ public class Server {
 	            //	this.processConnections();
 	        	} catch ( EOFException eofException ) {
 	            	System.out.println( "\nServer terminated connection" );
-	            } finally {
-	            	//-- this.closeConnections(); -- Se comenta porque es un servidor de varios, y tiene que seguir estando activo
+	            } catch(SocketException e){
+	           
 	            } 
+	            
 	         }
 	         
 	    } catch ( IOException ioException ) {
@@ -100,7 +101,6 @@ public class Server {
 	 * @throws IOException 
 	 */
 	public void close() throws IOException {
-		ClientThread.sendToAll(new Message("SERVER>>> TERMINATE","SERVER"));
 		this.closeConnections();
 		Server.server.close();
 		System.out.println("-- Conexiones cerradas --");
@@ -111,7 +111,9 @@ public class Server {
 	 */
 	private void closeConnections() throws IOException {
 		while(Server.clients != null && !Server.clients.isEmpty()){
-			((ClientThread)(Server.clients.removeFirst())).close();
+			ServerThread client = (ServerThread)(Server.clients.removeFirst());
+			client.sendMessage(new Message(new Command(Command.CLOSE_CONNECTION),"SERVER"));
+			client.close();
 		}
 	}
 	
@@ -145,7 +147,7 @@ public class Server {
 		System.out.println("#  Conexiones Activas   #");
 		System.out.println("=========================");
 		for(int i=0; i<Server.clients.size();i++){
-			ClientThread cliente = (ClientThread)Server.clients.get(i);
+			ServerThread cliente = (ServerThread)Server.clients.get(i);
 			System.out.println((1+i)+": "+cliente.getConnection().getInetAddress().getHostName());
 		}
 		System.out.println("\n-------------------------");
@@ -154,7 +156,7 @@ public class Server {
 	public static LinkedList<String> getUsers(){
 		LinkedList<String> usuarios = new LinkedList<String>();
 		for(int i=0; i<Server.clients.size();i++){
-			ClientThread cliente = (ClientThread)Server.clients.get(i);
+			ServerThread cliente = (ServerThread)Server.clients.get(i);
 			usuarios.addLast(cliente.getNickname());
 		}
 		return usuarios;
