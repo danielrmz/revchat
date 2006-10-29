@@ -32,7 +32,10 @@ public class Command implements Serializable {
 		 */
 		public static final int NICK_REGISTER = 3;
 		
-		
+		/**
+		 * Fetch de Usuarios
+		 */
+		public static final int FETCH_USERS = 4;
 		
 		/**
 		 * Tipo local de comando

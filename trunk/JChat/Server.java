@@ -45,22 +45,32 @@ public class Server {
 	 * 
 	 */
 	public static ExecutorService pool; 
-	   
-	
+
 	/**
-	 * Constructor vacio
+	 * Mensaje personalizado inicial
 	 */
-	public Server() {
+	public static String initmsg = "";
+	
+	public Server(){
 		
 	}
-
+	
+	public Server(String initmsg){
+		Server.initmsg = initmsg;
+	}
+	
 	/**
 	 * Constructor con parametros definidos
 	 */
 	public Server(int port, int limit){
 		Server.user_limit = limit;
 		Server.port = port;
-		
+	}
+	
+	public Server(int port, int limit, String init_msg){
+		Server.user_limit = limit;
+		Server.port = port;
+		Server.initmsg = init_msg;
 	}
 	
 	/**
@@ -80,7 +90,6 @@ public class Server {
 	            	pool.execute(connection);
 	            	Server.clients.addLast(connection);
 	            	Server.viewConnections(); 
-	            
 	            //	this.processConnections();
 	        	} catch ( EOFException eofException ) {
 	            	System.out.println( "\nServer terminated connection" );

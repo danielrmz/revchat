@@ -82,13 +82,14 @@ public class Client {
 	 */
 	public void closeConnection() {
 		try {
+			 this.sendMessage(new Message(new Command(Command.REMOVE_USER,this.nickname),this.nickname));
 	         output.close(); 
 	         input.close(); 
 	         client.close(); 
 	         System.out.println("Conexion del cliente terminada");
 	        
-	    } catch ( IOException ioException ) {
-	         ioException.printStackTrace();
+	    }catch (SocketException e) {
+		}catch (IOException ioException) {
 	    } 
 	}
 
@@ -100,6 +101,8 @@ public class Client {
 		 try {
 			 output.writeObject(message);
 			 output.flush();
+		 } catch (SocketException se){
+		 
 		 } catch ( IOException ioException ) {
 			 ioException.printStackTrace();
 	         System.out.println( "\nError writing object" );
@@ -168,12 +171,14 @@ public class Client {
 		Message regnick = new Message(new Command(Command.NICK_REGISTER,nickname),this.client.getLocalAddress().toString());
 		this.sendMessage(regnick);
 		try {
-			Thread.sleep(15);
+			Thread.sleep(15); //-- Espera la respuesta por parte del servidor
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		//-- Checa la ultima entrada
 		Message reply = this.localhistory.getLast();
 		boolean ok = true;
+		//-- La verifica
 		if(reply.getTipo() == Message.COMMAND){
 			Command c = reply.getCommand();
 			if(c.type == Command.NICK_REGISTER){
@@ -181,7 +186,7 @@ public class Client {
 			}
 		}
 		
-		this.nickname = (ok)?nickname:"Usuario";
+		this.nickname = (ok)?nickname:"";
 		return ok;
 	}
 	

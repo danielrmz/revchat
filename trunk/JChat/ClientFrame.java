@@ -63,11 +63,13 @@ public class ClientFrame extends JFrame implements ActionListener {
 				if(ClientFrame.app != null && ClientFrame.app.client != null && !ClientFrame.app.client.isClosed()){
 					LinkedList<Message> diffs = ClientFrame.app.compare(localhistory);
 					
-					while(!diffs.isEmpty()){
+					while(!diffs.isEmpty() && !ClientFrame.app.getNickname().equals("")){
 						Message mensaje = (Message)diffs.removeFirst();
 						localhistory.addLast(mensaje);
-						if(mensaje.getTipo() == Message.MENSAJE){
-							displayMessage("\n"+mensaje.getUsuario()+ ">> " + mensaje.getMensaje());
+						if(mensaje.getTipo() == Message.MENSAJE && !mensaje.getUsuario().equals("SERVER")){
+							displayMessage(mensaje.getUsuario()+ ">> " + mensaje.getMensaje()+"\n");
+						} else if(mensaje.getTipo() == Message.MENSAJE && mensaje.getUsuario().equals("SERVER")){
+							displayMessage(mensaje.getMensaje()+"\n\n");
 						} else if(mensaje.getTipo() == Message.COMMAND){
 							parseCommand(mensaje.getCommand()); // se parsea el comando
 						}
@@ -96,13 +98,15 @@ public class ClientFrame extends JFrame implements ActionListener {
 		//Command list = ((Message)ClientFrame.app.getUsers()).getCommand();
 		switch(cmd.type){
 		case Command.ADD_USER:
-			System.out.println("Agrego usuario '"+(String)cmd.msg+"'");
 			String user = (String)cmd.msg;
 			this.userlist.addElement(user);
+			this.displayMessage("El usuario "+user+" entro en la sala.\n");
 			break;
 		case Command.REMOVE_USER:
 			String user_ = (String)cmd.msg;
 			this.userlist.removeElement(user_);
+			this.displayMessage("El usuario "+user_+" se salio de la sala.\n");
+			
 			break;
 		case Command.CLOSE_CONNECTION:
 			this.userlist.removeAllElements();
@@ -111,7 +115,17 @@ public class ClientFrame extends JFrame implements ActionListener {
 			ClientFrame.conectar.setVisible(true);
 			ClientFrame.desconectar.setVisible(false);
 			ClientFrame.app.closeConnection();
-			this.displayMessage("<< El server fue cerrado >> ");
+			this.displayMessage("\n<< El server fue cerrado >>\n ");
+			break;
+		
+		case Command.FETCH_USERS:
+			LinkedList usuarios = (LinkedList)cmd.msg;
+			while(!usuarios.isEmpty()){
+				String usuario = (String)usuarios.removeFirst();
+				if(!this.userlist.contains(usuario)){
+					this.userlist.addElement(usuario);
+				}
+			}
 			break;
 		}
 	}
@@ -239,6 +253,14 @@ public class ClientFrame extends JFrame implements ActionListener {
 		logbg.setLocation(4,4);
 		logbg.setSize(new Dimension(600,435));
 		jDesktop.add(logbg,JLayeredPane.PALETTE_LAYER);
+		
+		//-- Usuarios
+		JLabel users = new JLabel();
+		ImageIcon uimg = Main.getIconImage("users.png");
+		users.setIcon(uimg);
+		users.setSize(new Dimension(174,434));
+		users.setLocation(new Point(605,4));
+		jDesktop.add(users,JLayeredPane.PALETTE_LAYER);
 	}
 	
 
@@ -249,17 +271,19 @@ public class ClientFrame extends JFrame implements ActionListener {
 	 * 	
 	 * @return javax.swing.JList	
 	 */
-	private JList getLstUsers() {
-		if (lstUsers == null) {
-			try {
-				lstUsers = new JList(this.userlist);
-				lstUsers.setLocation(new Point(610,11));
-				lstUsers.setSize(new Dimension(165,300));
-			} catch (java.lang.Throwable e) {
-				
-			}
-		}
-		return lstUsers;
+	private JScrollPane getLstUsers() {
+		
+		lstUsers = new JList(this.userlist);
+		//lstUsers.setLocation(new Point(610,11));
+		lstUsers.setSize(new Dimension(165,417));
+		
+		JScrollPane usp = new JScrollPane(lstUsers,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		usp.setSize(new Dimension(160,417));
+		usp.setLocation(new Point(611,11));
+		usp.setOpaque(false);
+		usp.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY,1));
+			
+		return usp;
 	}
 
 	/**
@@ -415,6 +439,7 @@ public class ClientFrame extends JFrame implements ActionListener {
 	
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource().equals(cerrar)){
+			ClientFrame.app.closeConnection();
 			if(timer!=null && timer.isRunning()){
 				timer.stop();
 			}
@@ -422,6 +447,7 @@ public class ClientFrame extends JFrame implements ActionListener {
 			this.dispose();
 		} else if(e.getSource().equals(send)){
 			String txt = ClientFrame.msg.getText();
+			txt.trim(); //-- Se omiten los ultimos y los primeros espacios blancos que haya dejado
 			if(txt.equals("")) {
 				return;
 			}
@@ -429,7 +455,7 @@ public class ClientFrame extends JFrame implements ActionListener {
 			ClientFrame.app.sendMessage(msg);
 			ClientFrame.msg.setText("");
 		} else if(e.getSource().equals(conectar)){
-			
+			this.taLog.removeAll();
 			ConfigFrame frame = new ConfigFrame();
 			frame.setVisible(true);
 			
@@ -439,6 +465,9 @@ public class ClientFrame extends JFrame implements ActionListener {
 			ClientFrame.desconectar.setVisible(false);
 			ClientFrame.send.setEnabled(false);
 			ClientFrame.msg.setEnabled(false);
+			ClientFrame.msg.setText("");
+			this.displayMessage("Te saliste de la sala");
+			this.userlist.removeAllElements();
 		}
 	}
 	
@@ -458,7 +487,7 @@ public class ClientFrame extends JFrame implements ActionListener {
 	         {
 	            public void run() 
 	            {
-	               taLog.append( messageToDisplay ); 
+	               taLog.append(messageToDisplay); 
 	            } 
 	         } 
 	      ); 
