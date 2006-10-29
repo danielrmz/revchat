@@ -49,11 +49,13 @@ public class ServerThread implements Runnable {
 	public void close() {
 		if(this.connection != null){
 			try {
+				
 				this.output.close();
 				this.input.close();
 				this.connection.close();
 				Server.clients.remove(this);
 				this.connection = null;
+				System.out.println("El usuario '"+this.getNickname()+"' se salio");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -150,13 +152,23 @@ public class ServerThread implements Runnable {
 							Command c2 = new Command(Command.NICK_REGISTER,this.setNickname(nick));
 							Message m = new Message(c2,"SERVER");
 							this.sendMessage(m);
-						} 
+						} else if(c.type == Command.REMOVE_USER){
+							this.close();
+							//-- Se le da autorizacion del server 
+							Message m = new Message(message.getCommand(),"SERVER");
+							ServerThread.sendToAll(m);
+						} else if(c.type == Command.FETCH_USERS){
+							Command fu = new Command(Command.FETCH_USERS,Server.getUsers());
+							this.sendMessage(new Message(fu,"SERVER"));
+						}
 					}
 				}	
 				Thread.sleep(10);
 			
 			} catch (SocketException ee){ 
 				this.close();
+				Message m = new Message(new Command(Command.REMOVE_USER,this.nickname),"SERVER");
+				ServerThread.sendToAll(m);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			} catch (Exception e){
@@ -189,6 +201,10 @@ public class ServerThread implements Runnable {
 		this.nickname = nickname;
 		
 		//-- Se le notifica a todos que agreguen el nick a la lista
+		if(!Server.initmsg.equals("")){
+			this.sendMessage(new Message(Server.initmsg,"SERVER"));
+		}
+		
 		Message nickRegistered = new Message(new Command(Command.ADD_USER,nickname),"SERVER");
 		ServerThread.sendToAll(nickRegistered);
 		

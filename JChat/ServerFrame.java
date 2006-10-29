@@ -64,7 +64,7 @@ public class ServerFrame extends JFrame implements ActionListener {
 		display.setAutoscrolls(true);
 		display.setEditable(false);
 		//-- Accion Principal
-		server = new Server();
+		server = new Server("Bienvenido a dexochannel");
 		
 		timer = new Timer(100,new ActionListener(){
 			/**

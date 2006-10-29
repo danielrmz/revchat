@@ -120,6 +120,7 @@ public class ConfigFrame extends JDialog implements ActionListener {
 					return;
 				}
 				
+				ClientFrame.app.sendMessage(new Message(new Command(Command.FETCH_USERS),nickname));
 				//-- Reconfigura la pantalla principal para habilitar el chat
 				ClientFrame.conectar.setVisible(false);
 				ClientFrame.desconectar.setVisible(true);
