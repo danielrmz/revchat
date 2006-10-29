@@ -108,13 +108,14 @@ public class ServerFrame extends JFrame implements ActionListener {
 	 */
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource().equals(cerrar)){
-			if(timer != null && timer.isRunning()){
-				timer.stop();
-			}
 			try {
 				this.server.close();
 			} catch (IOException e1) {
 				e1.printStackTrace();
+			}
+			
+			if(timer != null && timer.isRunning()){
+				timer.stop();
 			}
 			Server.active = false;
 			this.dispose();
