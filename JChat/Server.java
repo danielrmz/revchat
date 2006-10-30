@@ -116,13 +116,14 @@ public class Server {
 	}
 	
 	/**
-	 * Cierra todas las conexiones existentes
+	 * Cierra todas las conexiones existentes de forma remota, 
+	 * por lo que no es necesario cerrarlas aqui, si se cerrara el programa como quiera.
 	 */
 	private void closeConnections() throws IOException {
 		while(Server.clients != null && !Server.clients.isEmpty()){
 			ServerThread client = (ServerThread)(Server.clients.removeFirst());
 			client.sendMessage(new Message(new Command(Command.CLOSE_CONNECTION),"SERVER"));
-			client.close();
+			//client.close();
 		}
 	}
 	

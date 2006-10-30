@@ -95,11 +95,11 @@ public class ConfigFrame extends JDialog implements ActionListener {
 			if(!nickname.equals("") && !hostip.equals("")){
 				//-- Inicializa el cliente.
 				if(ClientFrame.app == null){
-					ClientFrame.setClient(hostip);
+					ClientFrame.app = new Client(hostip);
 					this.server.setEnabled(false);
 				} else {
 					ClientFrame.app.closeConnection();
-					ClientFrame.setClient(hostip);
+					ClientFrame.app = new Client(hostip);
 				}
 				
 				//-- Intenta conectarse con el servidor

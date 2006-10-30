@@ -41,6 +41,10 @@ public class Client {
 	 */
 	public Socket client; 
 	
+	/**
+	 * Status
+	 */
+	private boolean connected = false;
 	
 	/**
 	 * Constructor
@@ -66,6 +70,7 @@ public class Client {
 			Receiver r = new Receiver();
 			r.start();
 			connected = true;
+			
 		} catch (ConnectException e){
 			System.out.println("Fallo la conexion con el servidor.");
 		} catch ( EOFException eofException ) {
@@ -74,6 +79,7 @@ public class Client {
 			ioException.printStackTrace();
 		} 
 		
+		this.connected = connected;
 		return connected;
 	} 
 	
@@ -82,12 +88,13 @@ public class Client {
 	 */
 	public void closeConnection() {
 		try {
+			if(client != null && this.connected)
 			 this.sendMessage(new Message(new Command(Command.REMOVE_USER,this.nickname),this.nickname));
 	         output.close(); 
 	         input.close(); 
 	         client.close(); 
+	         this.connected = false;
 	         System.out.println("Conexion del cliente terminada");
-	        
 	    }catch (SocketException e) {
 		}catch (IOException ioException) {
 	    } 
@@ -161,14 +168,27 @@ public class Client {
 	 * @return Returns the nickname.
 	 */
 	public String getNickname() {
-		return nickname;
+		return this.nickname;
 	}
 
+	/**
+	 * Regresa el estado de la conexion
+	 * @return
+	 */
+	public boolean getStatus(){
+		return this.connected;
+	}
 	/**
 	 * @param nickname The nickname to set.
 	 */
 	public boolean setNickname(String nickname) {
-		Message regnick = new Message(new Command(Command.NICK_REGISTER,nickname),this.client.getLocalAddress().toString());
+		Message regnick = null;
+		if(this.nickname.equals("")){
+			//-- Se le manda el address del usuario nadamas para cumplir con la condicion del constructor
+			regnick = new Message(new Command(Command.NICK_REGISTER,nickname),this.client.getLocalAddress().toString());
+		} else {
+			regnick = new Message(new Command(Command.NICK_CHANGE,nickname),this.client.getLocalAddress().toString());
+		}
 		this.sendMessage(regnick);
 		try {
 			Thread.sleep(15); //-- Espera la respuesta por parte del servidor
@@ -176,14 +196,23 @@ public class Client {
 			e.printStackTrace();
 		}
 		//-- Checa la ultima entrada
-		Message reply = this.localhistory.getLast();
+		Message reply = null;
+		//-- Espera la respuesta del servidor
+		while (true){
+			try {
+				reply = this.localhistory.getLast();
+			} catch (java.util.NoSuchElementException e){
+				continue;
+			}
+			break;
+		}
 		boolean ok = true;
 		//-- La verifica
 		if(reply.getTipo() == Message.COMMAND){
 			Command c = reply.getCommand();
 			if(c.type == Command.NICK_REGISTER){
 				ok = ((Boolean)c.msg).booleanValue();
-			}
+			} 
 		}
 		
 		this.nickname = (ok)?nickname:"";
@@ -204,7 +233,7 @@ public class Client {
 		}
 		
 		public void run() {
-			while(ClientFrame.app.client != null && !ClientFrame.app.client.isClosed()){
+			while(client != null && connected){
 				try {
 					message = (Message)input.readObject();
 					localhistory.addLast(message);
