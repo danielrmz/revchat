@@ -432,6 +432,11 @@ public class ClientFrame extends JFrame implements ActionListener {
 					String filename = file.getAbsolutePath();
 					filename = (filename.contains(".txt"))?filename:filename+".txt";
 					PrintWriter fileOut = new PrintWriter(new FileWriter(new File(filename)));
+					fileOut.println("*****************************");
+					fileOut.println("* Historial de la Sesión    *");
+					fileOut.println("* "+this.getDate()+"   *");
+					fileOut.println("*****************************");
+					fileOut.println();
 					String txt[] = taLog.getText().split("\n");
 					for(String t : txt){
 						fileOut.println(t);
