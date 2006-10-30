@@ -191,21 +191,17 @@ public class Client {
 		}
 		this.sendMessage(regnick);
 		try {
-			Thread.sleep(15); //-- Espera la respuesta por parte del servidor
+			Thread.sleep(20); //-- Espera la respuesta por parte del servidor
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 		//-- Checa la ultima entrada
 		Message reply = null;
-		//-- Espera la respuesta del servidor
-		while (true){
-			try {
+		try {
 				reply = this.localhistory.getLast();
-			} catch (java.util.NoSuchElementException e){
-				continue;
-			}
-			break;
+		} catch (java.util.NoSuchElementException e){
 		}
+			
 		boolean ok = true;
 		//-- La verifica
 		if(reply.getTipo() == Message.COMMAND){
