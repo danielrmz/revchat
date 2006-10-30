@@ -253,10 +253,35 @@ public class ClientFrame extends JFrame implements ActionListener {
 		jDesktop.add(getSend(), JLayeredPane.MODAL_LAYER);
 		jDesktop.add(getLstUsers(), JLayeredPane.MODAL_LAYER);
 		this.initBoxes();
-		
+		this.initFormatBar();
 		return jDesktop;
 	}
-
+	
+	private void initFormatBar(){
+		//TODO: Pasar los componentes a variables globales y agregar actionlisteners
+		//-- Bold 
+		JButton bold = new JButton();
+		ImageIcon boldimg = Main.getIconImage("bold.png");
+		bold.setIcon(boldimg);
+		bold.setSize(new Dimension(20,20));
+		bold.setLocation(new Point(10,490));
+		jDesktop.add(bold,JLayeredPane.MODAL_LAYER);
+		
+		JButton italic = new JButton();
+		ImageIcon italicimg = Main.getIconImage("italic.png");
+		italic.setIcon(italicimg);
+		italic.setSize(new Dimension(20,20));
+		italic.setLocation(new Point(32,490));
+		jDesktop.add(italic,JLayeredPane.MODAL_LAYER);
+		
+		JButton under = new JButton();
+		ImageIcon underimg = Main.getIconImage("underline.png");
+		under.setIcon(underimg);
+		under.setSize(new Dimension(20,20));
+		under.setLocation(new Point(54,490));
+		jDesktop.add(under,JLayeredPane.MODAL_LAYER);
+	}
+	
 	/**
 	 * Inicializa los bordes de los inputareas, es decir el layout
 	 */
