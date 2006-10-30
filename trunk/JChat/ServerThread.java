@@ -149,9 +149,15 @@ public class ServerThread implements Runnable {
 						ServerThread.sendToAll(message); //-- Se lo manda a todos
 					} else if(message.getTipo() == Message.COMMAND){
 						Command c = message.getCommand();
-						if(c.type == Command.NICK_REGISTER){
+						//TODO: Hacerlo switch
+						if(c.type == Command.NICK_REGISTER ){
 							String nick = (String)c.msg;
 							Command c2 = new Command(Command.NICK_REGISTER,this.setNickname(nick));
+							Message m = new Message(c2,"SERVER");
+							this.sendMessage(m);
+						} else if(c.type == Command.NICK_CHANGE){
+							String nick = (String)c.msg;
+							Command c2 = new Command(Command.NICK_REGISTER,this.changeNickname(nick));
 							Message m = new Message(c2,"SERVER");
 							this.sendMessage(m);
 						} else if(c.type == Command.REMOVE_USER){
@@ -182,32 +188,50 @@ public class ServerThread implements Runnable {
 		return this.nickname;
 	}
 	
-	public boolean setNickname(String nickname){
-		
+	public boolean nicknameExists(String nickname){
 		//-- No debe tomar el mismo nombre que el servidor
 		if(nickname.toUpperCase().equals("SERVER")) {
-			return false;
+			return true;
 		}
 		
 		//-- Se busca a ver si no esta registrado
 		for(int i = 0; i < Server.clients.size(); i++){
 			ServerThread client = (ServerThread)Server.clients.get(i);
 			String aux = client.getNickname();
-			if(aux.equals(nickname)) {
-				System.out.println(nickname+i);
-				return false;
+			if(aux.toUpperCase().equals(nickname.toUpperCase())) {
+				return true;
 			}
 		}
-		this.nickname = nickname;
-		
-		//-- Se le notifica a todos que agreguen el nick a la lista
-		if(!Server.initmsg.equals("")){
-			this.sendMessage(new Message(Server.initmsg,"SERVER"));
+		return false;
+	}
+	
+	
+	public boolean changeNickname(String nickname){
+		if(!this.nicknameExists(nickname)){
+			String changes[] = {this.nickname,nickname}; //Original,cambiado
+			Message nickRegistered = new Message(new Command(Command.NICK_CHANGE,changes),"SERVER");
+			ServerThread.sendToAll(nickRegistered);
+			this.nickname = nickname;
+			return true;
 		}
+		return false;
+	}
+	
+	public boolean setNickname(String nickname){
 		
-		Message nickRegistered = new Message(new Command(Command.ADD_USER,nickname),"SERVER");
-		ServerThread.sendToAll(nickRegistered);
-		
-		return true;
+		if(!this.nicknameExists(nickname)){
+			this.nickname = nickname;
+			
+			//-- Se le notifica a todos que agreguen el nick a la lista
+			if(!Server.initmsg.equals("")){
+				this.sendMessage(new Message(Server.initmsg,"SERVER"));
+			}
+			
+			Message nickRegistered = new Message(new Command(Command.ADD_USER,nickname),"SERVER");
+			ServerThread.sendToAll(nickRegistered);
+			
+			return true;
+		}
+		return false;
 	}
 }

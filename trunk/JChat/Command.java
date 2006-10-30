@@ -38,6 +38,11 @@ public class Command implements Serializable {
 		public static final int FETCH_USERS = 4;
 		
 		/**
+		 * Cambio de nick
+		 */
+		public static final int NICK_CHANGE = 5;
+		
+		/**
 		 * Tipo local de comando
 		 */
 		public int type = -1;
