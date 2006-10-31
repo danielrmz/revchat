@@ -138,6 +138,8 @@ public class ConfigFrame extends JDialog implements ActionListener {
 			ConfigFrame.setHostip(hostip);
 			ConfigFrame.setNickname(nickname);
 			this.dispose();
+		} else {
+			return;
 		}
 	}
 
