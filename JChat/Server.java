@@ -51,10 +51,16 @@ public class Server {
 	 */
 	public static String initmsg = "";
 	
-	public Server(){
-		
-	}
+	/**
+	 * Constructor vacio
+	 *
+	 */
+	public Server(){}
 	
+	/**
+	 * Constructor con mensaje de inicio
+	 * @param initmsg
+	 */
 	public Server(String initmsg){
 		Server.initmsg = initmsg;
 	}
@@ -67,6 +73,12 @@ public class Server {
 		Server.port = port;
 	}
 	
+	/**
+	 * Contructor con parametros mas amplios
+	 * @param port
+	 * @param limit
+	 * @param init_msg
+	 */
 	public Server(int port, int limit, String init_msg){
 		Server.user_limit = limit;
 		Server.port = port;
@@ -90,7 +102,7 @@ public class Server {
 	            	pool.execute(connection);
 	            	Server.clients.addLast(connection);
 	            	Server.viewConnections(); 
-	            //	this.processConnections();
+	        
 	        	} catch ( EOFException eofException ) {
 	            	System.out.println( "\nServer terminated connection" );
 	            } catch(SocketException e){
@@ -111,8 +123,9 @@ public class Server {
 	 */
 	public void close() throws IOException {
 		this.closeConnections();
-		Server.server.close();
-		System.out.println("-- Conexiones cerradas --");
+		if(Server.server!= null){
+			Server.server.close();
+		}
 	}
 	
 	/**
@@ -152,6 +165,9 @@ public class Server {
 		return neu;
 	}
 	
+	/**
+	 * Muestra las conexiones en consola
+	 */
 	public static void viewConnections(){
 		System.out.println("=========================");
 		System.out.println("#  Conexiones Activas   #");
@@ -160,9 +176,13 @@ public class Server {
 			ServerThread cliente = (ServerThread)Server.clients.get(i);
 			System.out.println((1+i)+": "+cliente.getConnection().getInetAddress().getHostName());
 		}
-		System.out.println("\n-------------------------");
+		System.out.println("\n-------------------------\n");
 	}
 	
+	/**
+	 * Trae los usuarios disponibles
+	 * @return
+	 */
 	public static LinkedList<String> getUsers(){
 		LinkedList<String> usuarios = new LinkedList<String>();
 		for(int i=0; i<Server.clients.size();i++){
