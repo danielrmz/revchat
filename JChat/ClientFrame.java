@@ -158,7 +158,7 @@ public class ClientFrame extends JFrame implements ActionListener {
 			String nicks[] = (String[])cmd.msg;
 			this.userlist.removeElement(nicks[0]);
 			this.userlist.addElement(nicks[1]);
-			this.displayMessage("> El usuario ["+nicks[0]+"] ha cambiado su nickname a ["+nicks[1]+"]");
+			this.displayMessage("> El usuario ["+nicks[0]+"] ha cambiado su nickname a ["+nicks[1]+"]\n");
 			break;
 		case Command.ADD_USER:
 			String user = (String)cmd.msg;
@@ -170,7 +170,7 @@ public class ClientFrame extends JFrame implements ActionListener {
 			String user_ = (String)cmd.msg;
 			this.userlist.removeElement(user_);
 			if(!user_.equals("")){
-				this.displayMessage(">El usuario "+user_+" se salio de la sala.\n");
+				this.displayMessage("> El usuario "+user_+" se salio de la sala.\n");
 			}
 			this.lblNumContacts.setText("Usuarios ["+this.userlist.getSize()+"]");
 			
@@ -463,8 +463,9 @@ public class ClientFrame extends JFrame implements ActionListener {
 					fileOut.println("*****************************");
 					fileOut.println();
 					String txt[] = taLog.getText().split("\n");
-					for(String t : txt){
-						fileOut.println(t);
+					
+					for(int i = 0; i<txt.length; i++){
+						fileOut.println(txt[i]);
 					}
 					fileOut.println();
 					fileOut.println("_______________________________________");
@@ -494,8 +495,8 @@ public class ClientFrame extends JFrame implements ActionListener {
 			System.exit(1);
 		} else if(txt.contains("\\nick ") && txt.indexOf("\\nick")==0){
 			String nickname = txt.replace("\\nick ","");
-			boolean success = ClientFrame.app.setNickname(nickname);
-			if(success) { ConfigFrame.setNickname(nickname);}
+			String success = ClientFrame.app.setNickname(nickname);
+			if(success.equals("")) { ConfigFrame.setNickname(nickname);}
 			return;
 		}
 		Message msg = new Message(txt,ConfigFrame.getNickname());	

@@ -88,16 +88,17 @@ public class Client {
 	 */
 	public void closeConnection() {
 		try {
-			if(client != null && this.connected)
+			if(client != null && output != null && input != null && this.connected)
 			 this.sendMessage(new Message(new Command(Command.REMOVE_USER,this.nickname),this.nickname));
 	         output.close(); 
 	         input.close(); 
 	         client.close(); 
 	         this.connected = false;
 	         System.out.println("Conexion del cliente terminada");
-	    }catch (SocketException e) {
-		}catch (IOException ioException) {
-	    } 
+	    } catch (SocketException e) {
+		} catch (IOException ioException) {
+		} catch (NullPointerException nul){}
+		
 	}
 
 	/**
@@ -109,7 +110,6 @@ public class Client {
 			 output.writeObject(message);
 			 output.flush();
 		 } catch (SocketException se){
-		 
 		 } catch ( IOException ioException ) {
 			 ioException.printStackTrace();
 	         System.out.println( "\nError writing object" );
@@ -181,7 +181,7 @@ public class Client {
 	/**
 	 * @param nickname The nickname to set.
 	 */
-	public boolean setNickname(String nickname) {
+	public String setNickname(String nickname) {
 		Message regnick = null;
 		if(this.nickname.equals("")){
 			//-- Se le manda el address del usuario nadamas para cumplir con la condicion del constructor
@@ -190,29 +190,37 @@ public class Client {
 			regnick = new Message(new Command(Command.NICK_CHANGE,nickname),this.client.getLocalAddress().toString());
 		}
 		this.sendMessage(regnick);
-		try {
-			Thread.sleep(20); //-- Espera la respuesta por parte del servidor
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		int i = 0;
+		while(localhistory.isEmpty()){ //-- Espera la respuesta por parte del servidor hasta que haya una respuesta o timeout
+			try {
+				Thread.sleep(10);
+				i++;
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			if(i == 10){
+				return "Servidor no disponible (timeout)";
+			}
 		}
 		//-- Checa la ultima entrada
-		Message reply = null;
-		try {
-				reply = this.localhistory.getLast();
-		} catch (java.util.NoSuchElementException e){
-		}
-			
-		boolean ok = true;
-		//-- La verifica
-		if(reply.getTipo() == Message.COMMAND){
-			Command c = reply.getCommand();
-			if(c.type == Command.NICK_REGISTER){
-				ok = ((Boolean)c.msg).booleanValue();
-			} 
-		}
+		Message reply;
 		
-		this.nickname = (ok)?nickname:"";
-		return ok;
+		if(!localhistory.isEmpty() && localhistory.getLast() != null){
+			reply = localhistory.getLast();
+			boolean ok = true;
+		
+			//-- La verifica
+			if(reply.getTipo() == Message.COMMAND){
+				Command c = reply.getCommand();
+				if(c.type == Command.NICK_REGISTER){
+					ok = ((Boolean)c.msg).booleanValue();
+				} 
+			}
+			this.nickname = (ok)?nickname:"";
+			return (ok)?"":"Ese nickname esta siendo usado";
+		}
+		System.out.println(this.nickname);
+		return "Error del servidor";
 	}
 	
 
