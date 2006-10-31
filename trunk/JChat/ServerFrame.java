@@ -65,7 +65,7 @@ public class ServerFrame extends JFrame implements ActionListener {
 		display.setEditable(false);
 		//-- Accion Principal
 		server = new Server("Bienvenido a dexochannel");
-		server.runServer();
+		
 		timer = new Timer(100,new ActionListener(){
 			/**
 			 * Metodo usado dentro del timer para actualizar el screen cada cierto tiempo

@@ -119,7 +119,7 @@ public class ClientFrame extends JFrame implements ActionListener {
 		} else if(e.getSource().equals(conectar)){
 			ConfigFrame frame = new ConfigFrame();
 			frame.setVisible(true);
-			if(ClientFrame.app.getStatus()){
+			if(ClientFrame.app != null && ClientFrame.app.getStatus()){
 				this.taLog.setText("");
 			}
 		} else if(e.getSource().equals(desconectar) || e.getSource().equals(logout)){
@@ -533,6 +533,7 @@ public class ClientFrame extends JFrame implements ActionListener {
 		ClientFrame.send.setEnabled(false);
 		ClientFrame.msg.setEnabled(false);
 		ClientFrame.msg.setText("");
+		ClientFrame.logout.setEnabled(false);
 		ClientFrame.app.localhistory.clear();
 		this.localhistory.clear();
 		this.displayMessage(msg);
