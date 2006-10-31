@@ -130,6 +130,7 @@ public class ConfigFrame extends JDialog implements ActionListener {
 				ClientFrame.desconectar.setVisible(true);
 				ClientFrame.send.setEnabled(true);
 				ClientFrame.msg.setEnabled(true);
+				ClientFrame.logout.setEnabled(true);
 			}
 			
 			//-- Guarda las variables para que si se desconecta al conectarse

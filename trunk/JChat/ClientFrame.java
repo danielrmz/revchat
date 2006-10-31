@@ -96,13 +96,44 @@ public class ClientFrame extends JFrame implements ActionListener {
 	private JLabel lblNumContacts = new JLabel();
 	
 	/**
-	 * This is the default constructor
+	 * Boton de logout
+	 */
+	public static JButton logout = new JButton();
+	
+	/**
+	 * This Constructor por default
 	 */
 	public ClientFrame() {
 		super("Revolution Chat");
 		this.initialize();
 	}
 
+	/**
+	 * Acciones del Frame
+	 */
+	public void actionPerformed(ActionEvent e) {
+		if(e.getSource().equals(cerrar)){
+			System.exit(1);
+		} else if(e.getSource().equals(send)){
+			this.send();
+		} else if(e.getSource().equals(conectar)){
+			ConfigFrame frame = new ConfigFrame();
+			frame.setVisible(true);
+			if(ClientFrame.app.getStatus()){
+				this.taLog.setText("");
+			}
+		} else if(e.getSource().equals(desconectar) || e.getSource().equals(logout)){
+			this.close("> Has cerrado la sesion  \n");
+		} else if(e.getSource().equals(sobre)){
+			AboutFrame frame = new AboutFrame();
+			frame.setVisible(true);
+		} else if(e.getSource().equals(guardar)){
+			this.save();
+		}
+	}
+	
+	//-- Empiezan bloques de construccion y manejo de la GUI
+	
 	/**
 	 * Inicializador de Componentes
 	 * @return void
@@ -176,15 +207,7 @@ public class ClientFrame extends JFrame implements ActionListener {
 			
 			break;
 		case Command.CLOSE_CONNECTION:
-			this.lblNumContacts.setText("Usuarios [0]");
-			this.userlist.removeAllElements();
-			ClientFrame.msg.setEnabled(false);
-			ClientFrame.send.setEnabled(false);
-			ClientFrame.conectar.setVisible(true);
-			ClientFrame.desconectar.setVisible(false);
-			ClientFrame.app.closeConnection();
-			
-			this.displayMessage("\n> El server fue cerrado "+this.getDate()+"\n ");
+			this.close("\n> El server fue cerrado "+this.getDate()+"\n ");
 			
 			break;
 		
@@ -265,6 +288,7 @@ public class ClientFrame extends JFrame implements ActionListener {
 		bold.setIcon(boldimg);
 		bold.setSize(new Dimension(20,20));
 		bold.setLocation(new Point(10,490));
+		bold.setToolTipText("Negrita");
 		jDesktop.add(bold,JLayeredPane.MODAL_LAYER);
 		
 		JButton italic = new JButton();
@@ -272,6 +296,7 @@ public class ClientFrame extends JFrame implements ActionListener {
 		italic.setIcon(italicimg);
 		italic.setSize(new Dimension(20,20));
 		italic.setLocation(new Point(32,490));
+		italic.setToolTipText("Italica");
 		jDesktop.add(italic,JLayeredPane.MODAL_LAYER);
 		
 		JButton under = new JButton();
@@ -279,7 +304,18 @@ public class ClientFrame extends JFrame implements ActionListener {
 		under.setIcon(underimg);
 		under.setSize(new Dimension(20,20));
 		under.setLocation(new Point(54,490));
+		under.setToolTipText("Subrayado");
+		
 		jDesktop.add(under,JLayeredPane.MODAL_LAYER);
+		
+		logout.addActionListener(this);
+		logout.setToolTipText("Terminar Sesión");
+		logout.setEnabled(false);
+		ImageIcon logoutimg = Main.getIconImage("logout.png");
+		logout.setIcon(logoutimg);
+		logout.setSize(new Dimension(20,20));
+		logout.setLocation(new Point(90,490));
+		jDesktop.add(logout,JLayeredPane.MODAL_LAYER);
 	}
 	
 	/**
@@ -411,81 +447,12 @@ public class ClientFrame extends JFrame implements ActionListener {
 		return send;
 	}
 
-	/**
-	 * Acciones del Frame
-	 */
-	public void actionPerformed(ActionEvent e) {
-		if(e.getSource().equals(cerrar)){
-			if(ClientFrame.app!=null){
-				ClientFrame.app.closeConnection();
-			}
-			if(timer!=null && timer.isRunning()){
-				timer.stop();
-			}
-			System.exit(1);
-			this.dispose();
-		} else if(e.getSource().equals(send)){
-			this.send();
-		} else if(e.getSource().equals(conectar)){
-			ConfigFrame frame = new ConfigFrame();
-			frame.setVisible(true);
-			if(ClientFrame.app.getStatus()){
-				this.taLog.setText("");
-			}
-			
-		} else if(e.getSource().equals(desconectar)){
-			ClientFrame.app.closeConnection();
-			ClientFrame.conectar.setVisible(true);
-			ClientFrame.desconectar.setVisible(false);
-			ClientFrame.send.setEnabled(false);
-			ClientFrame.msg.setEnabled(false);
-			ClientFrame.msg.setText("");
-			ClientFrame.app.localhistory.clear();
-			this.localhistory.clear();
-			this.displayMessage("> Has cerrado la sesion  \n");
-			this.lblNumContacts.setText("Usuarios [0]");
-			this.userlist.removeAllElements();
-		} else if(e.getSource().equals(sobre)){
-			AboutFrame frame = new AboutFrame();
-			frame.setVisible(true);
-		} else if(e.getSource().equals(guardar)){
-			JFileChooser fc = new JFileChooser(Main.RUTA);
-			fc.showSaveDialog(this);
-			File file = fc.getSelectedFile();
-			if(file!=null){
-				try {
-					String filename = file.getAbsolutePath();
-					filename = (filename.contains(".txt"))?filename:filename+".txt";
-					PrintWriter fileOut = new PrintWriter(new FileWriter(new File(filename)));
-					fileOut.println("*****************************");
-					fileOut.println("* Historial de la Sesión    *");
-					fileOut.println("* "+this.getDate()+"   *");
-					fileOut.println("*****************************");
-					fileOut.println();
-					String txt[] = taLog.getText().split("\n");
-					
-					for(int i = 0; i<txt.length; i++){
-						fileOut.println(txt[i]);
-					}
-					fileOut.println();
-					fileOut.println("_______________________________________");
-					fileOut.println("Revolution Chat : derechos reservados");
-					fileOut.close();
-				}
-				catch (FileNotFoundException fnfe) {
-					System.out.println("Archivo no encontrado");
-				}
-				catch (IOException nsee) {
-					System.out.println("Problem with IO");
-				}
-			}
-		}
-	}
+
 	
 	/**
 	 * Manda el mensaje
 	 */
-	public void send(){
+	private void send(){
 		String txt = ClientFrame.msg.getText();
 		txt.trim(); //-- Se omiten los ultimos y los primeros espacios blancos que haya dejado
 		if(txt.equals("")) {
@@ -505,10 +472,43 @@ public class ClientFrame extends JFrame implements ActionListener {
 		ClientFrame.msg.requestFocus();
 	}
 	
+	private void save(){
+		JFileChooser fc = new JFileChooser(Main.RUTA);
+		fc.showSaveDialog(this);
+		File file = fc.getSelectedFile();
+		if(file!=null){
+			try {
+				String filename = file.getAbsolutePath();
+				filename = (filename.contains(".txt"))?filename:filename+".txt";
+				PrintWriter fileOut = new PrintWriter(new FileWriter(new File(filename)));
+				fileOut.println("*****************************");
+				fileOut.println("* Historial de la Sesión    *");
+				fileOut.println("* "+this.getDate()+"   *");
+				fileOut.println("*****************************");
+				fileOut.println();
+				String txt[] = taLog.getText().split("\n");
+				
+				for(int i = 0; i<txt.length; i++){
+					fileOut.println(txt[i]);
+				}
+				fileOut.println();
+				fileOut.println("_______________________________________");
+				fileOut.println("Revolution Chat : derechos reservados");
+				fileOut.close();
+			}
+			catch (FileNotFoundException fnfe) {
+				System.out.println("Archivo no encontrado");
+			}
+			catch (IOException nsee) {
+				System.out.println("Problem with IO");
+			}
+		}
+	}
+	
 	/**
 	 * Despliega el mensaje en el textarea
 	 */
-	public void displayMessage(final String messageToDisplay) {
+	private void displayMessage(final String messageToDisplay) {
 	      SwingUtilities.invokeLater(
 	         new Runnable() 
 	         {
@@ -518,6 +518,26 @@ public class ClientFrame extends JFrame implements ActionListener {
 	            } 
 	         } 
 	      ); 
+	}
+	
+	/**
+	 * Reestablece los valores para cuando se cierra una conexion
+	 */
+	private void close(String msg){
+		if(ClientFrame.app == null || !ClientFrame.app.getStatus()) {
+			return;
+		}
+		ClientFrame.app.closeConnection();
+		ClientFrame.conectar.setVisible(true);
+		ClientFrame.desconectar.setVisible(false);
+		ClientFrame.send.setEnabled(false);
+		ClientFrame.msg.setEnabled(false);
+		ClientFrame.msg.setText("");
+		ClientFrame.app.localhistory.clear();
+		this.localhistory.clear();
+		this.displayMessage(msg);
+		this.lblNumContacts.setText("Usuarios [0]");
+		this.userlist.removeAllElements();
 	}
 	
 	/**
