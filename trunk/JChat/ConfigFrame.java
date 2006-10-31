@@ -113,11 +113,14 @@ public class ConfigFrame extends JDialog implements ActionListener {
 				
 				//-- Intenta registrar el nick, si ya esta ocupado
 				//-- regresa mensaje de error
-				boolean registered = ClientFrame.app.setNickname(nickname);
-				if(!registered){
+				String registered = ClientFrame.app.setNickname(nickname);
+				if(!registered.equals("")){
 					error.setForeground(Color.RED);
-					error.setText("Nickname esta siendo usado");
+					error.setText(registered);
 					error.setVisible(true);
+					if(registered.equals("Servidor no disponible (timeout)")){
+						server.setEnabled(true);
+					}
 					return;
 				}
 				
