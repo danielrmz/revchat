@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+
 import javax.swing.*;
 
 /** 
@@ -21,7 +22,7 @@ public class ConfigFrame extends JDialog implements ActionListener {
 	
 	private JButton cancelar = new JButton("Cancelar");
 	
-	private JTextField nick = new JTextField(ConfigFrame.getNickname().equals("")?"Anonimo":ConfigFrame.getNickname());
+	private JTextField nick = new JTextField(ConfigFrame.getNickname().equals("")?"":ConfigFrame.getNickname());
 	
 	private JTextField server = new JTextField(ConfigFrame.getHostip());
 	

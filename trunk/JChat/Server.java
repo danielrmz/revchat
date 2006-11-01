@@ -42,7 +42,7 @@ public class Server {
 	public static boolean active = true;
 	
 	/**
-	 * 
+	 * Pool de threads
 	 */
 	public static ExecutorService pool; 
 
@@ -93,7 +93,7 @@ public class Server {
 		
 		try {
 	         server = new ServerSocket(Server.port, Server.user_limit); 
-	         System.out.println("Waiting Connections");
+	         System.out.println("Esperando conexiones");
 	        
 	         while (Server.active) {
 	        	try {
@@ -101,10 +101,10 @@ public class Server {
 	            	ServerThread connection = new ServerThread(serversocket);
 	            	pool.execute(connection);
 	            	Server.clients.addLast(connection);
-	            	Server.viewConnections(); 
+	          //  	Server.viewConnections(); 
 	        
 	        	} catch ( EOFException eofException ) {
-	            	System.out.println( "\nServer terminated connection" );
+	            	System.out.println( "\nError del server" );
 	            } catch(SocketException e){
 	           
 	            } 
