@@ -242,6 +242,11 @@ public class ServerFrame extends JFrame implements ActionListener {
 		}
 	}
 	
+	/**
+	 * Ordena la lista mandada
+	 * @param usuarios
+	 * @return
+	 */
 	private Object[] sort(LinkedList usuarios){
 		Object[] u = usuarios.toArray();
 		
@@ -257,6 +262,10 @@ public class ServerFrame extends JFrame implements ActionListener {
 		return u;
 	}
 	
+	/**
+	 * Regresa la fecha actual
+	 * @return
+	 */
 	private String getDate(){
 		java.text.DateFormat format = java.text.DateFormat.getDateTimeInstance();
 		format.setTimeZone(TimeZone.getTimeZone("UTC"));
