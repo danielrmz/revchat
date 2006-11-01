@@ -27,12 +27,15 @@ public class ConfigFrame extends JDialog implements ActionListener {
 	
 	private JLabel error = new JLabel("");
 	
-	public ConfigFrame() {
+	private ClientFrame frame = null;
+	
+	public ConfigFrame(ClientFrame frame) {
 		this.setSize(new Dimension(217,130));
 		this.setLocation(new Point(250,230));
 		this.setTitle("Iniciar...");
 		this.setResizable(false);
 		this.setModal(true);
+		this.frame = frame;
 		
 		JLayeredPane principal = this.getLayeredPane();
 		JLabel lblNick = new JLabel("Nickname ");
@@ -94,16 +97,16 @@ public class ConfigFrame extends JDialog implements ActionListener {
 			//-- Si no estan vacios los campos, se conecta
 			if(!nickname.equals("") && !hostip.equals("")){
 				//-- Inicializa el cliente.
-				if(ClientFrame.app == null){
-					ClientFrame.app = new Client(hostip);
+				if(this.frame.app == null){
+					this.frame.app = new Client(hostip);
 					this.server.setEnabled(false);
 				} else {
-					ClientFrame.app.closeConnection();
-					ClientFrame.app = new Client(hostip);
+					this.frame.app.closeConnection();
+					this.frame.app = new Client(hostip);
 				}
 				
 				//-- Intenta conectarse con el servidor
-				if(!ClientFrame.app.runClient()){
+				if(!this.frame.app.runClient()){
 					error.setForeground(Color.RED);
 					error.setText("     Servidor no disponible");
 					error.setVisible(true);
@@ -113,7 +116,7 @@ public class ConfigFrame extends JDialog implements ActionListener {
 				
 				//-- Intenta registrar el nick, si ya esta ocupado
 				//-- regresa mensaje de error
-				String registered = ClientFrame.app.setNickname(nickname);
+				String registered = this.frame.app.setNickname(nickname);
 				if(!registered.equals("")){
 					error.setForeground(Color.RED);
 					error.setText(registered);
@@ -124,13 +127,13 @@ public class ConfigFrame extends JDialog implements ActionListener {
 					return;
 				}
 				
-				ClientFrame.app.sendMessage(new Message(new Command(Command.FETCH_USERS),nickname));
+				this.frame.app.sendMessage(new Message(new Command(Command.FETCH_USERS),nickname));
 				//-- Reconfigura la pantalla principal para habilitar el chat
-				ClientFrame.conectar.setVisible(false);
-				ClientFrame.desconectar.setVisible(true);
-				ClientFrame.send.setEnabled(true);
-				ClientFrame.msg.setEnabled(true);
-				ClientFrame.logout.setEnabled(true);
+				this.frame.conectar.setVisible(false);
+				this.frame.desconectar.setVisible(true);
+				this.frame.send.setEnabled(true);
+				this.frame.msg.setEnabled(true);
+				this.frame.logout.setEnabled(true);
 			}
 			
 			//-- Guarda las variables para que si se desconecta al conectarse

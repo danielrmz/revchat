@@ -18,7 +18,7 @@ public class ServerMain {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		ServerFrame frame = new ServerFrame();
+		ServerFrame2 frame = new ServerFrame2();
 		int user_limit = 100;
 		if ( args.length != 0 ) {
 			String arg = args[0].toLowerCase();
@@ -38,7 +38,7 @@ public class ServerMain {
 	 * @return image
 	 */
 	public static ImageIcon getIconImage(String filename){	
-		ImageIcon image = new ImageIcon(Main.RUTA+"img/"+filename);
+		ImageIcon image = new ImageIcon(ServerMain.RUTA+"img/"+filename);
 		if(image.getImageLoadStatus()==4) return null;
 		return image;
 	}

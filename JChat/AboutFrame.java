@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
 
 import javax.swing.*;
 
@@ -22,27 +23,23 @@ public class AboutFrame extends JDialog implements ActionListener {
 		this.setTitle("Sobre el Revolution Chat...");
 		this.getContentPane().setLayout(new BorderLayout());
 		this.setResizable(false);
-		//ImageIcon logo = Main.getIconImage("logo.png");
 		this.setSize(420,250);
 		this.setLocation(new Point(200,200));
 		this.setModal(true);
 		
-		ImageIcon img = Main.getIconImage("banner.png");
+		ImageIcon img = this.getIconImage("banner.png");
 		JLabel top = new JLabel(img);
 		top.setSize(415,70);
 		this.add(top,BorderLayout.NORTH);
 		
 		JPanel centro = new JPanel(new BorderLayout());
-		ImageIcon java = Main.getIconImage("java.gif");
+		ImageIcon java = this.getIconImage("java.gif");
 		
-		//JLabel l = new JLabel(logo);
-		//l.setSize(new Dimension(32,60));
 		JLabel j = new JLabel(java);
 		JPanel left = new JPanel(new BorderLayout());
 		JPanel auxleft = new JPanel(new BorderLayout());
 		
 		j.setSize(new Dimension(34,63));
-	//	auxleft.add(l,BorderLayout.NORTH);
 		auxleft.add(j,BorderLayout.SOUTH);
 		left.add(new JLabel("    "),BorderLayout.WEST);
 		left.add(new JLabel("  "),BorderLayout.EAST);
@@ -78,5 +75,15 @@ public class AboutFrame extends JDialog implements ActionListener {
 		this.dispose();
 	}
 	
+	/**
+	 * Regresa el ImageIcon de una imagen especificada
+	 * @param filename
+	 * @return image
+	 */
+	public ImageIcon getIconImage(String filename){	
+		ImageIcon image = new ImageIcon((new File ("").getAbsolutePath())+"/img/"+filename);
+		if(image.getImageLoadStatus()==4) return null;
+		return image;
+	}
 
 }
