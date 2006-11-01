@@ -37,7 +37,7 @@ public class ServerFrame extends JFrame implements ActionListener {
 	/**
 	 * Historia local, para no hacer dependiente el server del Frame
 	 */
-	private LinkedList<Message> localhistory = new LinkedList<Message>();
+	private LinkedList localhistory = new LinkedList();
 	
 	/**
 	 * Timer de Revision
@@ -72,7 +72,7 @@ public class ServerFrame extends JFrame implements ActionListener {
 			 * comparando el historial local contra el del servidor 
 			 */
 			public void actionPerformed(ActionEvent arg0) {
-				LinkedList<Message> diffs = server.compare(localhistory);
+				LinkedList diffs = server.compare(localhistory);
 				
 				while(!diffs.isEmpty()){
 					Message mensaje = (Message)diffs.removeFirst();

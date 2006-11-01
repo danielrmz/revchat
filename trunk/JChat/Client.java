@@ -34,7 +34,7 @@ public class Client {
 	/**
 	 * Log local
 	 */
-	public LinkedList<Message> localhistory = new LinkedList<Message>();
+	public LinkedList localhistory = new LinkedList();
 
 	/**
 	 * Socket de conexion
@@ -70,7 +70,7 @@ public class Client {
 			Receiver r = new Receiver();
 			r.start();
 			connected = true;
-			
+		} catch (UnknownHostException uh){
 		} catch (ConnectException e){
 			System.out.println("Fallo la conexion con el servidor.");
 		} catch ( EOFException eofException ) {
@@ -128,8 +128,8 @@ public class Client {
 	/**
 	 * Compara las ultimas entradas
 	 */
-	public LinkedList<Message> compare(LinkedList remote){
-		LinkedList<Message> neu = new LinkedList<Message>();
+	public LinkedList compare(LinkedList remote){
+		LinkedList neu = new LinkedList();
 		int j = -1;
 		
 		if(remote != null && !remote.isEmpty()) {
@@ -153,14 +153,14 @@ public class Client {
 	/**
 	 * @return Returns the localhistory.
 	 */
-	public LinkedList<Message> getLocalhistory() {
+	public LinkedList getLocalhistory() {
 		return localhistory;
 	}
 
 	/**
 	 * @param localhistory The localhistory to set.
 	 */
-	public void setLocalhistory(LinkedList<Message> localhistory) {
+	public void setLocalhistory(LinkedList localhistory) {
 		this.localhistory = localhistory;
 	}
 
@@ -206,7 +206,7 @@ public class Client {
 		Message reply;
 		
 		if(!localhistory.isEmpty() && localhistory.getLast() != null){
-			reply = localhistory.getLast();
+			reply = (Message)localhistory.getLast();
 			boolean ok = true;
 		
 			//-- La verifica

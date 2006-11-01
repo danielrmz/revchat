@@ -18,13 +18,13 @@ public class Server {
 	/**
 	 * Clientes del servidor
 	 */
-	public static LinkedList<ServerThread> clients = new LinkedList<ServerThread>(); 
+	public static LinkedList clients = new LinkedList(); 
 	
 	/**
 	 * Historial del Chat 
 	 * Es un arreglo de [0] Usuario [1] Linea dicha
 	 */
-	public static LinkedList<Message> history = new LinkedList<Message>(); 
+	public static LinkedList history = new LinkedList(); 
 	
 	/**
 	 * Puerto de Conexion
@@ -143,8 +143,8 @@ public class Server {
 	/**
 	 * Compara las ultimas entradas
 	 */
-	public LinkedList<Message> compare(LinkedList remote){
-		LinkedList<Message> neu = new LinkedList<Message>();
+	public LinkedList compare(LinkedList remote){
+		LinkedList neu = new LinkedList();
 		int j = -1;
 		
 		if(remote != null && !remote.isEmpty()) {
@@ -183,8 +183,8 @@ public class Server {
 	 * Trae los usuarios disponibles
 	 * @return
 	 */
-	public static LinkedList<String> getUsers(){
-		LinkedList<String> usuarios = new LinkedList<String>();
+	public static LinkedList getUsers(){
+		LinkedList usuarios = new LinkedList();
 		for(int i=0; i<Server.clients.size();i++){
 			ServerThread cliente = (ServerThread)Server.clients.get(i);
 			usuarios.addLast(cliente.getNickname());

@@ -56,6 +56,7 @@ public class ServerThread implements Runnable {
 				Server.clients.remove(this);
 				this.connection = null;
 				Message m = new Message(new Command(Command.REMOVE_USER,this.nickname),"SERVER");
+				Server.history.add(m);
 				ServerThread.sendToAll(m);
 				System.out.println("El usuario '"+this.getNickname()+"' se salio");
 			} catch (IOException e) {
@@ -149,7 +150,6 @@ public class ServerThread implements Runnable {
 						ServerThread.sendToAll(message); //-- Se lo manda a todos
 					} else if(message.getTipo() == Message.COMMAND){
 						Command c = message.getCommand();
-						//TODO: Hacerlo switch
 						if(c.type == Command.NICK_REGISTER ){
 							String nick = (String)c.msg;
 							Command c2 = new Command(Command.NICK_REGISTER,this.setNickname(nick));
@@ -211,6 +211,7 @@ public class ServerThread implements Runnable {
 			String changes[] = {this.nickname,nickname}; //Original,cambiado
 			Message nickRegistered = new Message(new Command(Command.NICK_CHANGE,changes),"SERVER");
 			ServerThread.sendToAll(nickRegistered);
+			Server.history.add(nickRegistered);
 			this.nickname = nickname;
 			return true;
 		}
@@ -229,7 +230,6 @@ public class ServerThread implements Runnable {
 			
 			Message nickRegistered = new Message(new Command(Command.ADD_USER,nickname),"SERVER");
 			ServerThread.sendToAll(nickRegistered);
-			
 			return true;
 		}
 		return false;

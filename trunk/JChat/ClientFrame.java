@@ -22,17 +22,17 @@ public class ClientFrame extends JFrame implements ActionListener {
 	/**
 	 * Conexion del Cliente
 	 */
-	public static Client app;
+	public Client app;
 	
 	/**
 	 * Menu Item Conectar
 	 */
-	public static JMenuItem conectar = null;
+	public JMenuItem conectar = null;
 	
 	/**
 	 * Menu Item desconectar
 	 */
-	public static JMenuItem desconectar = null;
+	public JMenuItem desconectar = null;
 	
 	/**
 	 * JList de Usuarios conectados
@@ -42,12 +42,12 @@ public class ClientFrame extends JFrame implements ActionListener {
 	/**
 	 * Boton de Enviar mensaje
 	 */
-	public static JButton send = null;
+	public  JButton send = null;
 	
 	/**
 	 * Textarea del mensaje a mandar
 	 */
-	public static JTextArea msg = null;
+	public  JTextArea msg = null;
 	
 	/**
 	 * Panel de Contenidos principal en capas
@@ -77,7 +77,7 @@ public class ClientFrame extends JFrame implements ActionListener {
 	/**
 	 * Linkedlist de la historia local.
 	 */
-	private LinkedList<Message> localhistory = new LinkedList<Message>();
+	private LinkedList localhistory = new LinkedList();
 	
 	/**
 	 * Timer del action listener
@@ -98,7 +98,7 @@ public class ClientFrame extends JFrame implements ActionListener {
 	/**
 	 * Boton de logout
 	 */
-	public static JButton logout = new JButton();
+	public JButton logout = new JButton();
 	
 	/**
 	 * This Constructor por default
@@ -107,6 +107,8 @@ public class ClientFrame extends JFrame implements ActionListener {
 		super("Revolution Chat");
 		this.initialize();
 	}
+	
+	private final String ruta = (new File ("").getAbsolutePath());
 
 	/**
 	 * Acciones del Frame
@@ -117,9 +119,9 @@ public class ClientFrame extends JFrame implements ActionListener {
 		} else if(e.getSource().equals(send)){
 			this.send();
 		} else if(e.getSource().equals(conectar)){
-			ConfigFrame frame = new ConfigFrame();
+			ConfigFrame frame = new ConfigFrame(this);
 			frame.setVisible(true);
-			if(ClientFrame.app != null && ClientFrame.app.getStatus()){
+			if(this.app != null && this.app.getStatus()){
 				this.taLog.setText("");
 			}
 		} else if(e.getSource().equals(desconectar) || e.getSource().equals(logout)){
@@ -151,9 +153,9 @@ public class ClientFrame extends JFrame implements ActionListener {
 			 * comparando el historial local contra el del servidor 
 			 */
 			public void actionPerformed(ActionEvent arg0) {
-				if(ClientFrame.app != null && ClientFrame.app.getStatus()){
-					LinkedList<Message> diffs = ClientFrame.app.compare(localhistory);
-					while(!diffs.isEmpty() && !ClientFrame.app.getNickname().equals("")){
+				if(app != null && app.getStatus()){
+					LinkedList diffs = app.compare(localhistory);
+					while(!diffs.isEmpty() && !app.getNickname().equals("")){
 						Message mensaje = (Message)diffs.removeFirst();
 						localhistory.addLast(mensaje);
 						if(mensaje.getTipo() == Message.MENSAJE && !mensaje.getUsuario().equals("SERVER")){
@@ -189,7 +191,7 @@ public class ClientFrame extends JFrame implements ActionListener {
 			String nicks[] = (String[])cmd.msg;
 			this.userlist.removeElement(nicks[0]);
 			this.userlist.addElement(nicks[1]);
-			this.displayMessage("> El usuario ["+nicks[0]+"] ha cambiado su nickname a ["+nicks[1]+"]\n");
+			this.displayMessage("> El usuario [ "+nicks[0]+" ] ha cambiado su nickname a [ "+nicks[1]+" ]\n");
 			break;
 		case Command.ADD_USER:
 			String user = (String)cmd.msg;
@@ -284,7 +286,7 @@ public class ClientFrame extends JFrame implements ActionListener {
 		//TODO: Pasar los componentes a variables globales y agregar actionlisteners
 		//-- Bold 
 		JButton bold = new JButton();
-		ImageIcon boldimg = Main.getIconImage("bold.png");
+		ImageIcon boldimg = this.getIconImage("bold.png");
 		bold.setIcon(boldimg);
 		bold.setSize(new Dimension(20,20));
 		bold.setLocation(new Point(10,490));
@@ -292,7 +294,7 @@ public class ClientFrame extends JFrame implements ActionListener {
 		jDesktop.add(bold,JLayeredPane.MODAL_LAYER);
 		
 		JButton italic = new JButton();
-		ImageIcon italicimg = Main.getIconImage("italic.png");
+		ImageIcon italicimg = this.getIconImage("italic.png");
 		italic.setIcon(italicimg);
 		italic.setSize(new Dimension(20,20));
 		italic.setLocation(new Point(32,490));
@@ -300,7 +302,7 @@ public class ClientFrame extends JFrame implements ActionListener {
 		jDesktop.add(italic,JLayeredPane.MODAL_LAYER);
 		
 		JButton under = new JButton();
-		ImageIcon underimg = Main.getIconImage("underline.png");
+		ImageIcon underimg = this.getIconImage("underline.png");
 		under.setIcon(underimg);
 		under.setSize(new Dimension(20,20));
 		under.setLocation(new Point(54,490));
@@ -309,9 +311,9 @@ public class ClientFrame extends JFrame implements ActionListener {
 		jDesktop.add(under,JLayeredPane.MODAL_LAYER);
 		
 		logout.addActionListener(this);
-		logout.setToolTipText("Terminar Sesión");
+		logout.setToolTipText("Terminar Sesin");
 		logout.setEnabled(false);
-		ImageIcon logoutimg = Main.getIconImage("logout.png");
+		ImageIcon logoutimg = this.getIconImage("logout.png");
 		logout.setIcon(logoutimg);
 		logout.setSize(new Dimension(20,20));
 		logout.setLocation(new Point(90,490));
@@ -323,7 +325,7 @@ public class ClientFrame extends JFrame implements ActionListener {
 	 */
 	private void initBoxes(){
 		JLabel bg = new JLabel();
-		ImageIcon bgimg = Main.getIconImage("bg.png");
+		ImageIcon bgimg = this.getIconImage("bg.png");
 		bg.setIcon(bgimg);
 		bg.setLocation(new Point(0,0));
 		bg.setSize(new Dimension(800,547));
@@ -331,7 +333,7 @@ public class ClientFrame extends JFrame implements ActionListener {
 		
 		//-- Message Box Area
 		JLabel msgbox = new JLabel();
-		ImageIcon mbimg = Main.getIconImage("messagebox.png");
+		ImageIcon mbimg = this.getIconImage("messagebox.png");
 		msgbox.setIcon(mbimg);
 		msgbox.setLocation(4,440);
 		msgbox.setSize(new Dimension(775,75));
@@ -339,7 +341,7 @@ public class ClientFrame extends JFrame implements ActionListener {
 		
 		//-- History Log
 		JLabel logbg = new JLabel();
-		ImageIcon logimg = Main.getIconImage("logbox.png");
+		ImageIcon logimg = this.getIconImage("logbox.png");
 		logbg.setIcon(logimg);
 		logbg.setLocation(4,4);
 		logbg.setSize(new Dimension(600,435));
@@ -347,14 +349,14 @@ public class ClientFrame extends JFrame implements ActionListener {
 		
 		//-- Usuarios
 		JLabel users = new JLabel();
-		ImageIcon uimg = Main.getIconImage("usersbox.png");
+		ImageIcon uimg = this.getIconImage("usersbox.png");
 		users.setIcon(uimg);
 		users.setSize(new Dimension(174,434));
 		users.setLocation(new Point(606,4));
 		jDesktop.add(users,JLayeredPane.PALETTE_LAYER);
 		
 		JLabel contacts = new JLabel();
-		ImageIcon cimg = Main.getIconImage("contacts.png");
+		ImageIcon cimg = this.getIconImage("contacts.png");
 		contacts.setIcon(cimg);
 		contacts.setSize(new Dimension(22,22));
 		contacts.setLocation(new Point(613,5));
@@ -453,36 +455,36 @@ public class ClientFrame extends JFrame implements ActionListener {
 	 * Manda el mensaje
 	 */
 	private void send(){
-		String txt = ClientFrame.msg.getText();
+		String txt = this.msg.getText();
 		txt.trim(); //-- Se omiten los ultimos y los primeros espacios blancos que haya dejado
 		if(txt.equals("")) {
 			return;
 		} else if(txt.equals("\\exit")){
 			this.dispose();
 			System.exit(1);
-		} else if(txt.contains("\\nick ") && txt.indexOf("\\nick")==0){
-			String nickname = txt.replace("\\nick ","");
-			String success = ClientFrame.app.setNickname(nickname);
+		} else if(txt.indexOf("\\nick")==0){
+			String nickname = txt.substring(5,txt.length());
+			String success = this.app.setNickname(nickname);
 			if(success.equals("")) { ConfigFrame.setNickname(nickname);}
 			return;
 		}
 		Message msg = new Message(txt,ConfigFrame.getNickname());	
-		ClientFrame.app.sendMessage(msg);
-		ClientFrame.msg.setText("");
-		ClientFrame.msg.requestFocus();
+		this.app.sendMessage(msg);
+		this.msg.setText("");
+		this.msg.requestFocus();
 	}
 	
 	private void save(){
-		JFileChooser fc = new JFileChooser(Main.RUTA);
+		JFileChooser fc = new JFileChooser(this.ruta);
 		fc.showSaveDialog(this);
 		File file = fc.getSelectedFile();
 		if(file!=null){
 			try {
 				String filename = file.getAbsolutePath();
-				filename = (filename.contains(".txt"))?filename:filename+".txt";
+				filename = (filename.indexOf(".txt")!=-1)?filename:filename+".txt";
 				PrintWriter fileOut = new PrintWriter(new FileWriter(new File(filename)));
 				fileOut.println("*****************************");
-				fileOut.println("* Historial de la Sesión    *");
+				fileOut.println("* Historial de la Sesin    *");
 				fileOut.println("* "+this.getDate()+"   *");
 				fileOut.println("*****************************");
 				fileOut.println();
@@ -524,17 +526,17 @@ public class ClientFrame extends JFrame implements ActionListener {
 	 * Reestablece los valores para cuando se cierra una conexion
 	 */
 	private void close(String msg){
-		if(ClientFrame.app == null || !ClientFrame.app.getStatus()) {
+		if(this.app == null || !this.app.getStatus()) {
 			return;
 		}
-		ClientFrame.app.closeConnection();
-		ClientFrame.conectar.setVisible(true);
-		ClientFrame.desconectar.setVisible(false);
-		ClientFrame.send.setEnabled(false);
-		ClientFrame.msg.setEnabled(false);
-		ClientFrame.msg.setText("");
-		ClientFrame.logout.setEnabled(false);
-		ClientFrame.app.localhistory.clear();
+		this.app.closeConnection();
+		this.conectar.setVisible(true);
+		this.desconectar.setVisible(false);
+		this.send.setEnabled(false);
+		this.msg.setEnabled(false);
+		this.msg.setText("");
+		this.logout.setEnabled(false);
+		this.app.localhistory.clear();
 		this.localhistory.clear();
 		this.displayMessage(msg);
 		this.lblNumContacts.setText("Usuarios [0]");
@@ -559,11 +561,22 @@ public class ClientFrame extends JFrame implements ActionListener {
                     isSelected, 
                     cellHasFocus);
 			
-			super.setIcon(Main.getIconImage("user.png"));
+			super.setIcon(getIconImage("user.png"));
 			super.setText((String)value);
 	        super.setBorder(BorderFactory.createMatteBorder(0,0,1,0,new Color(242,242,242)));
 			
 	        return this;
 		}
+	}
+		
+	/**
+	 * Regresa el ImageIcon de una imagen especificada
+	 * @param filename
+	 * @return image
+	 */
+	public ImageIcon getIconImage(String filename){	
+		ImageIcon image = new ImageIcon(this.ruta+"/img/"+filename);
+		if(image.getImageLoadStatus()==4) return null;
+		return image;
 	}
 } 
