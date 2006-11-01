@@ -18,7 +18,7 @@ public class ServerMain {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		ServerFrame2 frame = new ServerFrame2();
+		ServerFrame frame = new ServerFrame();
 		int user_limit = 100;
 		if ( args.length != 0 ) {
 			String arg = args[0].toLowerCase();

@@ -115,6 +115,7 @@ public class ClientFrame extends JFrame implements ActionListener {
 	 */
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource().equals(cerrar)){
+			this.close("");
 			System.exit(1);
 		} else if(e.getSource().equals(send)){
 			this.send();
@@ -283,41 +284,20 @@ public class ClientFrame extends JFrame implements ActionListener {
 	}
 	
 	private void initFormatBar(){
-		//TODO: Pasar los componentes a variables globales y agregar actionlisteners
-		//-- Bold 
-		JButton bold = new JButton();
-		ImageIcon boldimg = this.getIconImage("bold.png");
-		bold.setIcon(boldimg);
-		bold.setSize(new Dimension(20,20));
-		bold.setLocation(new Point(10,490));
-		bold.setToolTipText("Negrita");
-		jDesktop.add(bold,JLayeredPane.MODAL_LAYER);
-		
-		JButton italic = new JButton();
-		ImageIcon italicimg = this.getIconImage("italic.png");
-		italic.setIcon(italicimg);
-		italic.setSize(new Dimension(20,20));
-		italic.setLocation(new Point(32,490));
-		italic.setToolTipText("Italica");
-		jDesktop.add(italic,JLayeredPane.MODAL_LAYER);
-		
-		JButton under = new JButton();
-		ImageIcon underimg = this.getIconImage("underline.png");
-		under.setIcon(underimg);
-		under.setSize(new Dimension(20,20));
-		under.setLocation(new Point(54,490));
-		under.setToolTipText("Subrayado");
-		
-		jDesktop.add(under,JLayeredPane.MODAL_LAYER);
 		
 		logout.addActionListener(this);
-		logout.setToolTipText("Terminar Sesin");
+		logout.setToolTipText("Terminar Sesion");
 		logout.setEnabled(false);
 		ImageIcon logoutimg = this.getIconImage("logout.png");
 		logout.setIcon(logoutimg);
 		logout.setSize(new Dimension(20,20));
-		logout.setLocation(new Point(90,490));
+		logout.setLocation(new Point(12,490));
 		jDesktop.add(logout,JLayeredPane.MODAL_LAYER);
+		
+		JLabel help = new JLabel("Teclee '\\nick nombre' para cambiar su nickname, y \\exit para salir de la aplicación");
+		help.setSize(new Dimension(400,20));
+		help.setLocation(new Point(40,490));
+		jDesktop.add(help,JLayeredPane.MODAL_LAYER);
 	}
 	
 	/**
@@ -464,6 +444,7 @@ public class ClientFrame extends JFrame implements ActionListener {
 			System.exit(1);
 		} else if(txt.indexOf("\\nick")==0){
 			String nickname = txt.substring(5,txt.length());
+			nickname = nickname.trim();
 			String success = this.app.setNickname(nickname);
 			if(success.equals("")) { ConfigFrame.setNickname(nickname);}
 			return;

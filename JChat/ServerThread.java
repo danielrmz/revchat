@@ -56,9 +56,15 @@ public class ServerThread implements Runnable {
 				Server.clients.remove(this);
 				this.connection = null;
 				Message m = new Message(new Command(Command.REMOVE_USER,this.nickname),"SERVER");
-				Server.history.add(m);
-				ServerThread.sendToAll(m);
-				System.out.println("El usuario '"+this.getNickname()+"' se salio");
+				Message aux = (Message)Server.history.peek();
+				if(aux.getTipo() == Message.COMMAND && aux.getCommand().type == Command.REMOVE_USER && aux.getCommand().msg.equals(this.nickname)){
+					//-- la accion de este filtro esta en run... por si el usa el menuitem de cerrar
+				} else {
+					//-- Si el cliente no le dio cerrar en su ventana y lo cerro de otra forma
+					//-- se detecto y se guarda en el historial
+					Server.history.add(m);
+					ServerThread.sendToAll(m);
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -162,9 +168,6 @@ public class ServerThread implements Runnable {
 							this.sendMessage(m);
 						} else if(c.type == Command.REMOVE_USER){
 							this.close();
-							//-- Se le da autorizacion del server 
-							Message m = new Message(message.getCommand(),"SERVER");
-							ServerThread.sendToAll(m);
 						} else if(c.type == Command.FETCH_USERS){
 							Command fu = new Command(Command.FETCH_USERS,Server.getUsers());
 							this.sendMessage(new Message(fu,"SERVER"));
@@ -184,10 +187,19 @@ public class ServerThread implements Runnable {
 		}
 	}
 	
+	/**
+	 * Establece el nickname
+	 * @return
+	 */
 	public String getNickname(){
 		return this.nickname;
 	}
 	
+	/**
+	 * Verifica si un nickname existe
+	 * @param nickname
+	 * @return
+	 */
 	public boolean nicknameExists(String nickname){
 		//-- No debe tomar el mismo nombre que el servidor
 		if(nickname.toUpperCase().equals("SERVER")) {
@@ -205,7 +217,11 @@ public class ServerThread implements Runnable {
 		return false;
 	}
 	
-	
+	/**
+	 * Cambia el nickname del usuario de esta conexion
+	 * @param nickname
+	 * @return true si fue satisfactorio el cambio false de lo contrario
+	 */
 	public boolean changeNickname(String nickname){
 		if(!this.nicknameExists(nickname)){
 			String changes[] = {this.nickname,nickname}; //Original,cambiado
@@ -218,6 +234,11 @@ public class ServerThread implements Runnable {
 		return false;
 	}
 	
+	/**
+	 * Establece el nickname de un usuario nuevo
+	 * @param nickname
+	 * @return true si lo registro false si ocurrio un error
+	 */
 	public boolean setNickname(String nickname){
 		
 		if(!this.nicknameExists(nickname)){
