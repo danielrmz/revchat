@@ -2,6 +2,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
+
 import javax.swing.*;
 import javax.swing.Timer;
 
@@ -135,6 +136,26 @@ public class ClientFrame extends JFrame implements ActionListener {
 		}
 	}
 	
+	/**
+	 * Regresa un arreglo ordenado de objetos
+	 * @param usuarios
+	 * @return
+	 */
+	private Object[] sort(LinkedList usuarios){
+		Object[] u = usuarios.toArray();
+		
+		for(int i=0;i<usuarios.size();i++){
+			for(int j=i+1;j<usuarios.size();j++){
+				if(((String)u[i]).hashCode()>((String)u[j]).hashCode()){
+					String aux = (String)u[j];
+					u[j] = u[i];
+					u[i] = aux;
+				}
+			}
+		}
+		return u;
+	}
+	
 	//-- Empiezan bloques de construccion y manejo de la GUI
 	
 	/**
@@ -196,7 +217,16 @@ public class ClientFrame extends JFrame implements ActionListener {
 			break;
 		case Command.ADD_USER:
 			String user = (String)cmd.msg;
-			this.userlist.addElement(user);
+			if(!this.userlist.isEmpty()){
+				//-- Busca la posicion ordenada donde insertarlo
+				int j = 0;
+				while(j<userlist.getSize()&&((String)userlist.getElementAt(j)).hashCode()<user.hashCode()){
+					j++;
+				}
+				this.userlist.add(j-1,user);
+			} else {
+				this.userlist.addElement(user);
+			}
 			this.lblNumContacts.setText("Usuarios ["+this.userlist.getSize()+"]");
 			this.displayMessage("> El usuario "+user+" entro en la sala.\n");
 			break;
@@ -215,18 +245,23 @@ public class ClientFrame extends JFrame implements ActionListener {
 			break;
 		
 		case Command.FETCH_USERS:
-			LinkedList usuarios = (LinkedList)cmd.msg;
-			while(!usuarios.isEmpty()){
-				String usuario = (String)usuarios.removeFirst();
-				if(!this.userlist.contains(usuario)){
-					this.userlist.addElement(usuario);
+			Object[] usuarios = this.sort((LinkedList)cmd.msg);
+			
+			for(int i=0;i<usuarios.length; i++){
+				if(!this.userlist.contains(usuarios[i])){
+					this.userlist.addElement(usuarios[i]);
 				}
 			}
+			
 			this.lblNumContacts.setText("Usuarios ["+this.userlist.size()+"]");
 			break;
 		}
 	}
 	
+	/**
+	 * Trae la fecha del sistema
+	 * @return
+	 */
 	private String getDate(){
 		java.text.DateFormat format = java.text.DateFormat.getDateTimeInstance();
 		format.setTimeZone(TimeZone.getTimeZone("UTC"));
