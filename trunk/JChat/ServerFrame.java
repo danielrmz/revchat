@@ -309,6 +309,9 @@ public class ServerFrame extends JFrame implements ActionListener {
 		return jDesktop;
 	}
 	
+	/**
+	 * Crea la barra de formato que esta ubicada abajo del textarea del mensaje del usuario
+	 */
 	private void initFormatBar(){
 		logout.addActionListener(this);
 		logout.setToolTipText("Cerrar Servidor");
