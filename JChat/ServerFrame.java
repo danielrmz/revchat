@@ -73,7 +73,7 @@ public class ServerFrame extends JFrame implements ActionListener {
 	/**
 	 * Linkedlist de la historia local.
 	 */
-	private LinkedList localhistory = new LinkedList();
+	private LinkedList<Message> localhistory = new LinkedList<Message>();
 	
 	/**
 	 * Timer del action listener

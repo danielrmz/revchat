@@ -34,7 +34,7 @@ public class Client {
 	/**
 	 * Log local
 	 */
-	public LinkedList localhistory = new LinkedList();
+	public LinkedList<Message> localhistory = new LinkedList<Message>();
 
 	/**
 	 * Socket de conexion
@@ -129,7 +129,7 @@ public class Client {
 	 * Compara las ultimas entradas
 	 */
 	public LinkedList compare(LinkedList remote){
-		LinkedList neu = new LinkedList();
+		LinkedList<Message> neu = new LinkedList<Message>();
 		int j = -1;
 		
 		if(remote != null && !remote.isEmpty()) {
@@ -160,7 +160,7 @@ public class Client {
 	/**
 	 * @param localhistory The localhistory to set.
 	 */
-	public void setLocalhistory(LinkedList localhistory) {
+	public void setLocalhistory(LinkedList<Message> localhistory) {
 		this.localhistory = localhistory;
 	}
 
