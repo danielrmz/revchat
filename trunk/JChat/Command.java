@@ -4,7 +4,6 @@ import java.io.Serializable;
  * Clase Command.java 
  *
  * @author Revolution Software Developers
- * @package 
  **/
 public class Command implements Serializable {
 		/**

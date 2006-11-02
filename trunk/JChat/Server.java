@@ -7,7 +7,6 @@ import java.util.concurrent.*;
  * Clase Server.java 
  * Administra las conexiones entre los clientes
  * @author Revolution Software Developers
- * @package server
  **/
 public class Server {
 	/**
@@ -22,7 +21,7 @@ public class Server {
 	
 	/**
 	 * Historial del Chat 
-	 * Es un arreglo de [0] Usuario [1] Linea dicha
+	 * Es un arreglo de Mensajes
 	 */
 	public static LinkedList<Message> history = new LinkedList<Message>(); 
 	
@@ -53,7 +52,6 @@ public class Server {
 	
 	/**
 	 * Constructor vacio
-	 *
 	 */
 	public Server(){}
 	
@@ -63,26 +61,6 @@ public class Server {
 	 */
 	public Server(String initmsg){
 		Server.initmsg = initmsg;
-	}
-	
-	/**
-	 * Constructor con parametros definidos
-	 */
-	public Server(int port, int limit){
-		Server.user_limit = limit;
-		Server.port = port;
-	}
-	
-	/**
-	 * Contructor con parametros mas amplios
-	 * @param port
-	 * @param limit
-	 * @param init_msg
-	 */
-	public Server(int port, int limit, String init_msg){
-		Server.user_limit = limit;
-		Server.port = port;
-		Server.initmsg = init_msg;
 	}
 	
 	/**
@@ -181,7 +159,7 @@ public class Server {
 	
 	/**
 	 * Trae los usuarios disponibles
-	 * @return
+	 * @return LinkedList<String> usuarios existentes
 	 */
 	public static LinkedList<String> getUsers(){
 		LinkedList<String> usuarios = new LinkedList<String>();

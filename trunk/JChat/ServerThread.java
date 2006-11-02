@@ -5,7 +5,6 @@ import java.net.*;
  * Clase Connection.java 
  * Provee las conexiones de los usuarios
  * @author Revolution Software Developers
- * @package server
  **/
 
 public class ServerThread implements Runnable {
@@ -89,7 +88,7 @@ public class ServerThread implements Runnable {
 	
 	/**
 	 * Trae el mensaje proporcionado por el cliente
-	 * @return
+	 * @return Message Mensaje
 	 * @throws IOException
 	 */
 	public Message getMessage() throws SocketException, IOException {
@@ -131,8 +130,22 @@ public class ServerThread implements Runnable {
 	}
 	
 	/**
+	 * Manda el mensaje a un usuario determinado 
+	 * @param message
+	 */
+	public static void send(Message message){
+		for(int i = 0; i < Server.clients.size(); i++){
+			ServerThread client = (ServerThread)Server.clients.get(i);
+			if(client.nickname.equals(message.getDestinatario())){
+				client.sendMessage(message);
+				break;
+			}
+		}
+	}
+	
+	/**
 	 * Trae el hostname dependiendo de un ip
-	 * @return
+	 * @return String hostname de la conexion
 	 */
 	public String getHostName(){
 		return this.connection.getInetAddress().getHostName();
@@ -153,7 +166,11 @@ public class ServerThread implements Runnable {
 					Server.history.addLast(message); //-- Copia a Version local
 					
 					if(message.getTipo() == Message.MENSAJE){
-						ServerThread.sendToAll(message); //-- Se lo manda a todos
+						if(message.getDestinatario().equals("")){
+							ServerThread.sendToAll(message); //-- Se lo manda a todos
+						} else {
+							ServerThread.send(message);
+						}
 					} else if(message.getTipo() == Message.COMMAND){
 						Command c = message.getCommand();
 						if(c.type == Command.NICK_REGISTER ){
@@ -189,7 +206,7 @@ public class ServerThread implements Runnable {
 	
 	/**
 	 * Establece el nickname
-	 * @return
+	 * @return String regresa el nickname
 	 */
 	public String getNickname(){
 		return this.nickname;
@@ -198,7 +215,7 @@ public class ServerThread implements Runnable {
 	/**
 	 * Verifica si un nickname existe
 	 * @param nickname
-	 * @return
+	 * @return boolean si el nickname existe
 	 */
 	public boolean nicknameExists(String nickname){
 		//-- No debe tomar el mismo nombre que el servidor

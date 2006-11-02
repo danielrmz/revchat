@@ -9,7 +9,6 @@ import java.io.*;
  * privados.
  * 
  * @author Revolution Software Developers
- * @package client
  **/
 
 public class Message implements Serializable {
@@ -83,7 +82,6 @@ public class Message implements Serializable {
 	 * Constructor de un mensaje de un tipo determinado
 	 * @param mensaje
 	 * @param usuario
-	 * @param type
 	 */
 	public Message(Command mensaje, String usuario) {
 		this.mensaje = mensaje;
@@ -95,7 +93,6 @@ public class Message implements Serializable {
 	 * Mensaje de un tipo determinado para un usuario especifico
 	 * @param mensaje
 	 * @param usuario
-	 * @param type
 	 */
 	public Message(Command mensaje, String usuario, String destinatario) {
 		this.mensaje = mensaje;

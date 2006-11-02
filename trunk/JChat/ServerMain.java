@@ -5,7 +5,6 @@ import javax.swing.ImageIcon;
  * Clase ServerMain.java 
  * Clase que inicializa el main
  * @author Revolution Software Developers
- * @package 
  **/
 
 public class ServerMain {

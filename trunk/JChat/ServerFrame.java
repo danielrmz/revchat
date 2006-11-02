@@ -143,7 +143,6 @@ public class ServerFrame extends JFrame implements ActionListener {
 	//-- Empiezan bloques de construccion y manejo de la GUI
 	/**
 	 * Inicializador de Componentes
-	 * @return void
 	 */
 	private void initialize() {
 		this.setSize(788, 570);
@@ -175,11 +174,11 @@ public class ServerFrame extends JFrame implements ActionListener {
 					while(!diffs.isEmpty()){
 						Message mensaje = (Message)diffs.removeFirst();
 						localhistory.addLast(mensaje);
-						if(mensaje.getTipo() == Message.MENSAJE && !mensaje.getUsuario().equals("SERVER")){
+						if(mensaje.getTipo() == Message.MENSAJE && !mensaje.getUsuario().equals("SERVER") && mensaje.getDestinatario().equals("")){
 							displayMessage(mensaje.getUsuario()+ ">> " + mensaje.getMensaje()+"\n");
-						} else if(mensaje.getTipo() == Message.MENSAJE && mensaje.getUsuario().equals("SERVER")){
+						} else if(mensaje.getTipo() == Message.MENSAJE && mensaje.getUsuario().equals("SERVER") &&  mensaje.getDestinatario().equals("")){
 							displayMessage(mensaje.getMensaje()+"\n\n");
-						} else if(mensaje.getTipo() == Message.COMMAND){
+						} else if(mensaje.getTipo() == Message.COMMAND &&  mensaje.getDestinatario().equals("")){
 							parseCommand(mensaje.getCommand()); // se parsea el comando
 						}
 					}
@@ -245,7 +244,7 @@ public class ServerFrame extends JFrame implements ActionListener {
 	/**
 	 * Ordena la lista mandada
 	 * @param usuarios
-	 * @return
+	 * @return Object[] lista ordenada
 	 */
 	private Object[] sort(LinkedList usuarios){
 		Object[] u = usuarios.toArray();
@@ -264,7 +263,7 @@ public class ServerFrame extends JFrame implements ActionListener {
 	
 	/**
 	 * Regresa la fecha actual
-	 * @return
+	 * @return String fecha
 	 */
 	private String getDate(){
 		java.text.DateFormat format = java.text.DateFormat.getDateTimeInstance();
