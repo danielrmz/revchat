@@ -1,7 +1,5 @@
 import java.io.File;
 
-import javax.swing.ImageIcon;
-
 /** 
  * Clase ClientMain.java 
  * Clase que inicializa la aplicacion de cliente solamente
