@@ -102,6 +102,11 @@ public class ClientFrame extends JFrame implements ActionListener {
 	public JButton logout = new JButton();
 	
 	/**
+	 * Ventanas privadas abiertas
+	 */
+	public static LinkedList<String> privates = new LinkedList<String>();
+	
+	/**
 	 * This Constructor por default
 	 */
 	public ClientFrame() {
@@ -109,6 +114,9 @@ public class ClientFrame extends JFrame implements ActionListener {
 		this.initialize();
 	}
 	
+	/**
+	 * Ruta de la aplicacion
+	 */
 	private final String ruta = (new File ("").getAbsolutePath());
 
 	/**
@@ -127,7 +135,7 @@ public class ClientFrame extends JFrame implements ActionListener {
 				this.taLog.setText("");
 			}
 		} else if(e.getSource().equals(desconectar) || e.getSource().equals(logout)){
-			this.close("> Has cerrado la sesion  \n");
+			this.close("> Has cerrado la sesión  \n");
 		} else if(e.getSource().equals(sobre)){
 			AboutFrame frame = new AboutFrame();
 			frame.setVisible(true);
@@ -139,7 +147,7 @@ public class ClientFrame extends JFrame implements ActionListener {
 	/**
 	 * Regresa un arreglo ordenado de objetos
 	 * @param usuarios
-	 * @return
+	 * @return Arreglo ordenado de usuarios
 	 */
 	private Object[] sort(LinkedList usuarios){
 		Object[] u = usuarios.toArray();
@@ -160,7 +168,6 @@ public class ClientFrame extends JFrame implements ActionListener {
 	
 	/**
 	 * Inicializador de Componentes
-	 * @return void
 	 */
 	private void initialize() {
 		this.setSize(788, 570);
@@ -180,12 +187,18 @@ public class ClientFrame extends JFrame implements ActionListener {
 					while(!diffs.isEmpty() && !app.getNickname().equals("")){
 						Message mensaje = (Message)diffs.removeFirst();
 						localhistory.addLast(mensaje);
-						if(mensaje.getTipo() == Message.MENSAJE && !mensaje.getUsuario().equals("SERVER")){
+						if(mensaje.getTipo() == Message.MENSAJE && !mensaje.getUsuario().equals("SERVER") && mensaje.getDestinatario().equals("")){
 							displayMessage(mensaje.getUsuario()+ ">> " + mensaje.getMensaje()+"\n");
-						} else if(mensaje.getTipo() == Message.MENSAJE && mensaje.getUsuario().equals("SERVER")){
+						} else if(mensaje.getTipo() == Message.MENSAJE && mensaje.getUsuario().equals("SERVER")&&mensaje.getDestinatario().equals("")){
 							displayMessage(mensaje.getMensaje()+"\n\n");
-						} else if(mensaje.getTipo() == Message.COMMAND){
+						} else if(mensaje.getTipo() == Message.COMMAND && mensaje.getDestinatario().equals("")){
 							parseCommand(mensaje.getCommand()); // se parsea el comando
+						} else if(mensaje.getTipo() == Message.MENSAJE && !mensaje.getDestinatario().equals("")){
+							if(!ClientFrame.privates.contains(mensaje.getUsuario())&& !mensaje.getUsuario().equals(app.getNickname())){
+								PrivateFrame frame = new PrivateFrame(app,localhistory,mensaje.getUsuario());
+								ClientFrame.privates.addLast(mensaje.getUsuario());
+								frame.setVisible(true);
+						    } 
 						}
 					}
 				}
@@ -260,7 +273,7 @@ public class ClientFrame extends JFrame implements ActionListener {
 	
 	/**
 	 * Trae la fecha del sistema
-	 * @return
+	 * @return String fecha del sistema
 	 */
 	private String getDate(){
 		java.text.DateFormat format = java.text.DateFormat.getDateTimeInstance();
@@ -400,6 +413,31 @@ public class ClientFrame extends JFrame implements ActionListener {
 		usp.setOpaque(false);
 		usp.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY,1));
 			
+		lstUsers.addMouseListener(new MouseListener(){
+
+			public void mouseClicked(MouseEvent e) {
+				if(e.getClickCount() == 2){
+					int index = lstUsers.locationToIndex(e.getPoint());
+				    ListModel dlm = lstUsers.getModel();
+				    Object item = dlm.getElementAt(index);
+				    lstUsers.ensureIndexIsVisible(index);
+				    PrivateFrame frame = new PrivateFrame(app,localhistory,(String)item);
+				    if(!ClientFrame.privates.contains((String)item)&&!((String)item).equals(app.getNickname())){
+				    	ClientFrame.privates.addLast((String)item);
+				    	frame.setVisible(true);
+				    	return;
+				    } 
+				   
+				   
+				}
+			}
+
+			public void mousePressed(MouseEvent arg0) {}
+			public void mouseReleased(MouseEvent arg0) {}
+			public void mouseEntered(MouseEvent arg0) {}
+			public void mouseExited(MouseEvent arg0) {}
+        	
+        });
 		return usp;
 	}
 
@@ -484,7 +522,7 @@ public class ClientFrame extends JFrame implements ActionListener {
 			if(success.equals("")) { ConfigFrame.setNickname(nickname);}
 			return;
 		}
-		Message msg = new Message(txt,ConfigFrame.getNickname());	
+		Message msg = new Message(txt,this.app.getNickname());	
 		this.app.sendMessage(msg);
 		this.msg.setText("");
 		this.msg.requestFocus();
@@ -570,17 +608,20 @@ public class ClientFrame extends JFrame implements ActionListener {
 			this.setOpaque(true);
 		}
 
-		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+		public Component getListCellRendererComponent(JList list, final Object value, int index, boolean isSelected, boolean cellHasFocus) {
 			super.getListCellRendererComponent(list, 
                     value, 
                     index, 
                     isSelected, 
                     cellHasFocus);
-			
-			super.setIcon(getIconImage("user.png"));
+			if((value+"").equals(app.getNickname())){
+				super.setIcon(getIconImage("me.png"));
+			} else {
+				super.setIcon(getIconImage("user.png"));
+			}
 			super.setText((String)value);
 	        super.setBorder(BorderFactory.createMatteBorder(0,0,1,0,new Color(242,242,242)));
-			
+	        
 	        return this;
 		}
 	}

@@ -4,7 +4,6 @@ import java.io.File;
  * Clase ClientMain.java 
  * Clase que inicializa la aplicacion de cliente solamente
  * @author Revolution Software Developers
- * @package 
  **/
 
 public class ClientMain {

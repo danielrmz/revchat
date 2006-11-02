@@ -7,7 +7,6 @@ import java.util.LinkedList;
  * Engloba toda la información de un cliente del sistema.
  * 
  * @author Revolution Software Developers
- * @package client
  **/
 
 public class Client {
@@ -49,7 +48,6 @@ public class Client {
 	/**
 	 * Constructor
 	 * @param ip IP del servidor
-	 * @param nickname Nickname del usuario
 	 */
 	public Client(String ip) {
 		this.serverip = ip;
@@ -173,7 +171,7 @@ public class Client {
 
 	/**
 	 * Regresa el estado de la conexion
-	 * @return
+	 * @return boolean el estado de la conexion
 	 */
 	public boolean getStatus(){
 		return this.connected;
@@ -224,6 +222,9 @@ public class Client {
 	}
 	
 
+	/**
+	 * Clase que checa la recepcion de los mensajes
+	 */
 	private class Receiver extends Thread {
 		private Message message = null;
 		
