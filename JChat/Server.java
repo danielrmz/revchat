@@ -170,4 +170,14 @@ public class Server {
 		return usuarios;
 	}
 	
+	public void kick(String usuario){
+		for(int i=0; i<Server.clients.size();i++){
+			ServerThread cliente = (ServerThread)Server.clients.get(i);
+			if(cliente.getNickname().equals(usuario)){
+				cliente.sendMessage(new Message(new Command(Command.CLOSE_CONNECTION),"SERVER"));
+				return;
+			}
+		}
+	}
+	
 }

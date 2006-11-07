@@ -23,6 +23,11 @@ public class PrivateFrame extends JFrame implements WindowListener,ActionListene
 	private Client connection;
 	
 	/**
+	 * Conexion opcional para el servidor
+	 */
+	private Server serverconn;
+	
+	/**
 	 * Historial remoto
 	 */
 	private LinkedList<Message> history = null;
@@ -104,8 +109,48 @@ public class PrivateFrame extends JFrame implements WindowListener,ActionListene
 		this.msg.requestFocus();
 	}
 	
+	public PrivateFrame(Server app, LinkedList<Message>mainhistory, String destino) {
+		this.serverconn   = app;
+		this.destinatario = destino;
+		this.history = mainhistory;
+		timer = new Timer(10,new ActionListener(){
+
+			public void actionPerformed(ActionEvent arg0) {
+				if(history!=null && !history.isEmpty()){
+					Message aux = (Message)history.getLast();
+					if(aux.getTipo() == Message.MENSAJE && aux.getDestinatario().equals("SERVER")){
+						if(lastmessage == null){
+							lastmessage = aux;
+							displayMessage(lastmessage.getUsuario()+ ">> " + lastmessage.getMensaje()+"\n");
+						} else if(!lastmessage.equals(aux)){
+							lastmessage = aux;
+							displayMessage(lastmessage.getUsuario()+ ">> " + lastmessage.getMensaje()+"\n");
+						} 
+					} else if(aux.getTipo() == Message.COMMAND){
+						if(aux.getCommand().type == Command.REMOVE_USER){
+							msg.setEnabled(false);
+							send.setEnabled(false);
+						} else if(aux.getCommand().type == Command.ADD_USER){
+							msg.setEnabled(true);
+							send.setEnabled(true);
+						} else if(aux.getCommand().type == Command.NICK_CHANGE){
+							String[] nicks = (String[])aux.getCommand().msg;
+							setTitle(nicks[1]);
+						}
+					}
+				}
+			}});
+		timer.start();
+		this.setSize(new Dimension(337,297));
+		this.setLocation(new Point(250,230));
+		this.setTitle(destino);
+		this.setResizable(false);
+		this.addWindowListener(this);
+		this.initframe();
+		this.msg.requestFocus();
+	}
 	public void initframe(){
-		this.area.setSize(new Dimension(310,200));
+		this.area.setSize(new Dimension(310,150));
 		this.send.setSize(new Dimension(70,45));
 		this.send.setLocation(new Point(250,212));
 		this.msg.setSize(new Dimension(230,35));
@@ -146,12 +191,25 @@ public class PrivateFrame extends JFrame implements WindowListener,ActionListene
 	 * Manda el mensaje
 	 */
 	public void send(){
-		this.displayMessage(this.connection.getNickname()+">> "+msg.getText()+"\n");
-		String txt = msg.getText().trim();
-		Message m = new Message(txt,this.connection.getNickname(),this.destinatario);	
-		this.connection.sendMessage(m);
-		msg.setText("");
-		this.msg.requestFocus();
+		String nick = "";
+		if(this.connection != null){
+			nick = this.connection.getNickname();
+			this.displayMessage(this.connection.getNickname()+">> "+msg.getText()+"\n");
+			String txt = msg.getText().trim();
+			Message m = new Message(txt,nick,this.destinatario);	
+			this.connection.sendMessage(m);
+			msg.setText("");
+			this.msg.requestFocus();
+		} else {
+			this.displayMessage("SERVER >> "+msg.getText()+"\n");
+			nick = "SERVER";
+			String txt = msg.getText().trim();
+			Message m = new Message(txt,nick,this.destinatario);	
+			ServerThread.send(m);
+			msg.setText("");
+			this.msg.requestFocus();
+		}
+		
 	}
 
 	/**

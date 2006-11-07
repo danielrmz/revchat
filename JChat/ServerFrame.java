@@ -100,7 +100,12 @@ public class ServerFrame extends JFrame implements ActionListener {
 	 * Ruta de la aplicacino
 	 */
 	private final String ruta = (new File ("").getAbsolutePath());
-
+	
+	/**
+	 * Ventanas privadas abiertas
+	 */
+	public static LinkedList<String> privates = new LinkedList<String>();
+	
 	/**
 	 * This Constructor por default
 	 */
@@ -180,6 +185,12 @@ public class ServerFrame extends JFrame implements ActionListener {
 							displayMessage(mensaje.getMensaje()+"\n\n");
 						} else if(mensaje.getTipo() == Message.COMMAND &&  mensaje.getDestinatario().equals("")){
 							parseCommand(mensaje.getCommand()); // se parsea el comando
+						} else if(mensaje.getTipo() == Message.MENSAJE && !mensaje.getDestinatario().equals("")){
+							if(!ClientFrame.privates.contains(mensaje.getUsuario())&& !mensaje.getUsuario().equals("SERVER")){
+								PrivateFrame frame = new PrivateFrame(server,localhistory,mensaje.getUsuario());
+								ClientFrame.privates.addLast(mensaje.getUsuario());
+								frame.setVisible(true);
+						    } 
 						}
 					}
 				}
@@ -390,7 +401,32 @@ public class ServerFrame extends JFrame implements ActionListener {
 		usp.setLocation(new Point(612,31));
 		usp.setOpaque(false);
 		usp.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY,1));
-			
+		
+		lstUsers.addMouseListener(new MouseListener(){
+
+			public void mouseClicked(MouseEvent e) {
+				if(e.getClickCount() == 2){
+					int index = lstUsers.locationToIndex(e.getPoint());
+				    ListModel dlm = lstUsers.getModel();
+				    Object item = dlm.getElementAt(index);
+				    lstUsers.ensureIndexIsVisible(index);
+				    PrivateFrame frame = new PrivateFrame(server,localhistory,(String)item);
+				    if(!ClientFrame.privates.contains((String)item)&&!((String)item).equals("SERVER")){
+				    	ClientFrame.privates.addLast((String)item);
+				    	frame.setVisible(true);
+				    	return;
+				    } 
+				   
+				   
+				}
+			}
+
+			public void mousePressed(MouseEvent arg0) {}
+			public void mouseReleased(MouseEvent arg0) {}
+			public void mouseEntered(MouseEvent arg0) {}
+			public void mouseExited(MouseEvent arg0) {}
+        	
+        });
 		return usp;
 	}
 
@@ -472,6 +508,11 @@ public class ServerFrame extends JFrame implements ActionListener {
 			Server.initmsg = txt;
 			this.displayMessage("Mensaje inicial cambiado \n "+txt);
 			
+			return;
+		} else if(txt.indexOf("\\kick ")==0){
+			txt = txt.substring(5,txt.length());
+			txt = txt.trim();
+			this.server.kick(txt);
 			return;
 		}
 		Message msg = new Message(txt,"SERVER ");	
