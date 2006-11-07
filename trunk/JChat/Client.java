@@ -191,7 +191,7 @@ public class Client {
 		int i = 0;
 		while(localhistory.isEmpty()){ //-- Espera la respuesta por parte del servidor hasta que haya una respuesta o timeout
 			try {
-				Thread.sleep(10);
+				Thread.sleep(100);
 				i++;
 			} catch (InterruptedException e) {
 				e.printStackTrace();
